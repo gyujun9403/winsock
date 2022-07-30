@@ -1,5 +1,5 @@
 ﻿#include <algorithm>
-
+#include <iostream>
 #include "NetLib/ILog.h"
 #include "NetLib/TcpNetwork.h"
 #include "Packet.h"
@@ -43,7 +43,7 @@ Room* RoomManager::GetRoom(const short roomIndex)
 	if (roomIndex < 0 || roomIndex >= m_RoomList.size()) {
 		return nullptr;
 	}
-
+	std::cout << "index : " << roomIndex << std::endl;
 	return m_RoomList[roomIndex];
 }
 

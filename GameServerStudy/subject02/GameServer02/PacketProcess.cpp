@@ -1,4 +1,5 @@
 #include <cstring>
+#include <iostream>
 #include "PacketProcess.h"
 #include "NetLib/ILog.h"
 #include "NetLib/TcpNetwork.h"
@@ -76,6 +77,7 @@ ERROR_CODE PacketProcess::Login(PacketInfo packetInfo)
 	PktLogInRes resPkt;
 	auto reqPkt = (PktLogInReq*)packetInfo.pRefData;
 	auto addRet = this->refUserMgr_->AddUser(packetInfo.SessionIndex, reqPkt->szID);
+	std::cout << "id :" << reqPkt->szID << std::endl;
 	if (addRet != ERROR_CODE::NONE)
 	{
 		resPkt.SetError(addRet);
@@ -100,6 +102,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 	auto reqPkt = reinterpret_cast<PktRoomEnterReq*>(packetInfo.pRefData);
 	auto room = this->refRoomMgr_->GetRoom(reqPkt->RoomIndex);
 	// 유저 정보가 없는 유저가 입장을 요구한다면??? 
+	std::cout << "before : " << reqPkt->RoomIndex << std::endl;
 	if (room == nullptr)
 	{
 		pktRes.SetError(ERROR_CODE::ROOM_MGR_INVALID_INDEX);
@@ -109,6 +112,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 	}
 	else
 	{
+		//this->refLogger_->Write(LOG_TYPE::L_INFO, "%d", __FUNCTION__, reqPkt->RoomIndex);
 		if (room->GetUserCount() >= room->MaxUserCount())
 		{
 			pktRes.SetError(ERROR_CODE::ROOM_FULL);
@@ -169,5 +173,5 @@ ERROR_CODE PacketProcess::LeaveRoom(PacketInfo packetInfo)
 		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
 		return ERROR_CODE::NONE;
 	}
-	//우선 클라가 해당 
+	//나갈때 모든 유저에게 메세지기능
 }

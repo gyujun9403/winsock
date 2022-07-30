@@ -40,8 +40,9 @@ const int MAX_ROOM_TITLE_SIZE = 16;
 struct PktRoomEnterReq
 {
 	// 요청하는 방이 있는지
-	bool IsCreate;
-	short RoomIndex;
+	//bool IsCreate;
+	//short RoomIndex;
+	int RoomIndex;
 };
 
 struct pktroomenterres : PktBase
