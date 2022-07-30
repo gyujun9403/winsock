@@ -3,6 +3,8 @@
 #include "NetLib/ILog.h"
 #include "NetLib/TcpNetwork.h"
 #include "UserManager.h"
+#include "Room.h"
+#include "RoomManager.h"
 
 using LOG_TYPE = NServerNetLib::LOG_TYPE;
 using ServerConfig = NServerNetLib::ServerConfig;
@@ -87,4 +89,4 @@ ERROR_CODE PacketProcess::Login(PacketInfo packetInfo)
 		return ERROR_CODE::NONE;
 	}
 
-}
+}																

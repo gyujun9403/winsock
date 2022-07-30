@@ -33,6 +33,7 @@ void PacketProcess::Process(PacketInfo packetInfo)
 	using commonPacketId = PACKET_ID;
 	auto packetId = packetInfo.PacketId;
 
+	std::cout << packetId << std::endl;
 	switch (packetId)
 	{
 		case static_cast<int>(netLibPacketId::NTF_SYS_CONNECT_SESSION):
@@ -46,6 +47,12 @@ void PacketProcess::Process(PacketInfo packetInfo)
 			break;
 		case static_cast<int>(commonPacketId::ROOM_ENTER_REQ):
 			this->EnterRoom(packetInfo);
+			break;
+		case static_cast<int>(commonPacketId::ROOM_LEAVE_REQ):
+			this->LeaveRoom(packetInfo);
+			break;
+		case static_cast<int>(commonPacketId::ROOM_CHAT_REQ):
+			this->ChatInRoom(packetInfo);
 			break;
 	}
 
@@ -64,6 +71,8 @@ ERROR_CODE PacketProcess::NtfSysCloseSession(PacketInfo packetInfo)
 	if (user)
 	{
 		this->refUserMgr_->RemeveUser(packetInfo.SessionIndex);
+		// Homework
+		this->LeaveRoom(packetInfo);
 	}
 	else
 	{
@@ -98,7 +107,7 @@ ERROR_CODE PacketProcess::Login(PacketInfo packetInfo)
 
 ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 {
-	PktLogInRes pktRes; // 응답용 로그 패킷.
+	PktRoomEnterRes pktRes; // 응답용 로그 패킷.
 	auto reqPkt = reinterpret_cast<PktRoomEnterReq*>(packetInfo.pRefData);
 	auto room = this->refRoomMgr_->GetRoom(reqPkt->RoomIndex);
 	// 유저 정보가 없는 유저가 입장을 요구한다면??? 
@@ -106,7 +115,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 	if (room == nullptr)
 	{
 		pktRes.SetError(ERROR_CODE::ROOM_MGR_INVALID_INDEX);
-		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 		// this->refNetwork_->SendData
 		return ERROR_CODE::ROOM_MGR_INVALID_INDEX;
 	}
@@ -116,7 +125,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 		if (room->GetUserCount() >= room->MaxUserCount())
 		{
 			pktRes.SetError(ERROR_CODE::ROOM_FULL);
-			this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+			this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 			// this->refNetwork_->SendData
 			return ERROR_CODE::ROOM_FULL;
 		}
@@ -126,21 +135,21 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 			if (user == nullptr)
 			{
 				pktRes.SetError(ERROR_CODE::USER_MGR_NOT_CONFIRM_USER);
-				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				return ERROR_CODE::ROOM_NOT_LOGIN_USER;
 			}
 			else if (room->IsUserAlreadyEntered(user))
 			{
 				pktRes.SetError(ERROR_CODE::ROOM_ALREADY_ENTERED_ROOM);
-				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				return ERROR_CODE::ROOM_ALREADY_ENTERED_ROOM;
 			}
 			else
 			{
 				pktRes.SetError(ERROR_CODE::NONE);
-				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				room->Enter(user);
-				// this->refNetwork_->SendData
+				std::cout << packetInfo.SessionIndex << " enter" << std::endl;
 				return ERROR_CODE::NONE;
 			}
 		}
@@ -149,29 +158,56 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 
 ERROR_CODE PacketProcess::LeaveRoom(PacketInfo packetInfo)
 {
-	PktLogInRes pktRes;
+	PktRoomLeaveRes pktRes;
 	// 받는 정보 : 없는데?
 	// 방을 찾는 방법 -> 매니저에서 유저로 방 찾는 함수 생성
 	User* user = std::get<1>(this->refUserMgr_->GetUser(packetInfo.SessionIndex));
 	if (user == nullptr)
 	{
 		pktRes.SetError(ERROR_CODE::ROOM_NOT_LOGIN_USER);
-		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(PktRoomLeaveRes), (char*)&pktRes);
 		return ERROR_CODE::ROOM_NOT_LOGIN_USER;
 	}
 	Room* userEnteredRoom = this->refRoomMgr_->GetRoomUserEntered(user);
 	if (userEnteredRoom == nullptr)
 	{
 		pktRes.SetError(ERROR_CODE::ROOM_NO_ROOM_TO_LEAVE);
-		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(PktRoomLeaveRes), (char*)&pktRes);
 		return ERROR_CODE::ROOM_NO_ROOM_TO_LEAVE;
 	}
 	else
 	{
 		userEnteredRoom->Leave(user);
+		userEnteredRoom->BroadCastOtherLeave(user);
 		pktRes.SetError(ERROR_CODE::NONE);
-		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::LOGIN_IN_RES, sizeof(PktLogInRes), (char*)&pktRes);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(PktRoomLeaveRes), (char*)&pktRes);
 		return ERROR_CODE::NONE;
 	}
-	//나갈때 모든 유저에게 메세지기능
+}
+
+ERROR_CODE PacketProcess::ChatInRoom(PacketInfo packetInfo)
+{
+	PktRoomChatRes pktRes;
+
+	PktRoomChatReq* pktReq = reinterpret_cast<PktRoomChatReq*>(packetInfo.pRefData);
+	User* user = std::get<1>(this->refUserMgr_->GetUser(packetInfo.SessionIndex));
+	if (user == nullptr)
+	{
+		pktRes.SetError(ERROR_CODE::ROOM_NOT_LOGIN_USER);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
+		return ERROR_CODE::ROOM_NOT_LOGIN_USER;
+	}
+	Room* room = this->refRoomMgr_->GetRoomUserEntered(user);
+	if (room == nullptr)
+	{
+		pktRes.SetError(ERROR_CODE::ROOM_NO_ROOM_TO_CHAT);
+		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
+		return ERROR_CODE::ROOM_NO_ROOM_TO_CHAT;
+	}
+	std::wstring wMsg = pktReq->Msg;
+	std::string msg(wMsg.begin(), wMsg.end());
+	room->BroadCastOtherChat(user, msg);
+	pktRes.SetError(ERROR_CODE::NONE);
+	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
+	return ERROR_CODE::NONE;
 }

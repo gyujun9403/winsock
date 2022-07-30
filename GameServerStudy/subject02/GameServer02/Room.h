@@ -43,8 +43,9 @@ public:
 		return (std::find(this->m_UserList.begin(), this->m_UserList.end(), user) != this->m_UserList.end());
 	}
 	void Enter(User* user) { this->m_UserList.push_back(user); }
-	
 	void Leave(User* user) { this->m_UserList.erase(std::find(this->m_UserList.begin(), this->m_UserList.end(), user)); }
+	void BroadCastOtherLeave(User* other);
+	void BroadCastOtherChat(User* other, std::string msg);
 
 private:
 	ILog* m_pRefLogger;

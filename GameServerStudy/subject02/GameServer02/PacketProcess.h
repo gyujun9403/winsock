@@ -35,6 +35,7 @@ public:
 	ERROR_CODE Login(PacketInfo packetInfo);
 	ERROR_CODE EnterRoom(PacketInfo packetInfo);
 	ERROR_CODE LeaveRoom(PacketInfo packetInfo);
+	ERROR_CODE ChatInRoom(PacketInfo packetInfo);
 // ตฅภฬลอ
 public:
 	ILog* refLogger_;

@@ -41,11 +41,11 @@ struct PktRoomEnterReq
 {
 	// 요청하는 방이 있는지
 	//bool IsCreate;
-	//short RoomIndex;
-	int RoomIndex;
+	short RoomIndex;
+	//int RoomIndex;
 };
 
-struct pktroomenterres : PktBase
+struct PktRoomEnterRes : PktBase
 {
 
 };
@@ -57,8 +57,12 @@ struct pktroomenterres : PktBase
 // 룸나가기 요청...
 struct PktRoomLeaveReq { };
 
-// 룸 나가는 유저에게 하는 통보(아직은 로비에 있는).
-struct PktRoomLeaveUserINfoNtf
+struct PktRoomLeaveRes : PktBase
+{
+};
+
+// 룸 나가는 유저에게 하는 통보(아직은 로비에 있는).	
+struct PktRoomLeaveUserInfoNtf
 {
 	char UserId[MAX_USER_ID_SIZE] = { 0, };
 };
