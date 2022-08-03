@@ -110,7 +110,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 	PktRoomEnterRes pktRes; // 응답용 로그 패킷.
 	auto reqPkt = reinterpret_cast<PktRoomEnterReq*>(packetInfo.pRefData);
 	auto room = this->refRoomMgr_->GetRoom(reqPkt->RoomIndex);
-	// 유저 정보가 없는 유저가 입장을 요구한다면??? 
+	// 유저 정보가 없는 유저가 입장을 요구한다면?
 	std::cout << "before : " << reqPkt->RoomIndex << std::endl;
 	if (room == nullptr)
 	{
