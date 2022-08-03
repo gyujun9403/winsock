@@ -39,17 +39,23 @@ struct PktLogInRes : PktBase
 const int MAX_ROOM_TITLE_SIZE = 16;
 struct PktRoomEnterReq
 {
-	// 요청하는 방이 있는지
+	// TODO:
 	//bool IsCreate;
-	short RoomIndex;
-	//int RoomIndex;
+	//short RoomIndex;
+	int RoomIndex;
 };
 
 struct PktRoomEnterRes : PktBase
 {
-
+	long long UniqueId;
 };
 
+struct PktRoomEnterUserInfoNtf
+{
+	long long uniqueId;
+	char idlen;
+	char UserID[MAX_USER_ID_SIZE];
+};
 
 // 유저 정보가 있는것도 있고 없는것도 있는데 뭐지
 // 헤더 정보도 없는거 같은데
@@ -64,7 +70,9 @@ struct PktRoomLeaveRes : PktBase
 // 룸 나가는 유저에게 하는 통보(아직은 로비에 있는).	
 struct PktRoomLeaveUserInfoNtf
 {
-	char UserId[MAX_USER_ID_SIZE] = { 0, };
+	// TODO:
+	//char UserId[MAX_USER_ID_SIZE] = { 0, };
+	long long uniqueId;
 };
 
 // 룸 채팅 메세지의 최대 사이즈.
@@ -72,7 +80,10 @@ const int MAX_ROOM_CHAT_MSG_SIZE = 256;
 // 룸에서 채팅하는 request 매세지를 담는 구조체
 struct PktRoomChatReq
 {
-	wchar_t Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
+	// TODO:
+	short Msglen;
+	//wchar_t Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
+	char Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
 };
 
 struct PktRoomChatRes : PktBase
@@ -83,7 +94,10 @@ struct PktRoomChatRes : PktBase
 // 유저에게 공지를 보내는거 같은데...
 struct PktRoomChatNtf
 {
-	char UserID[MAX_USER_ID_SIZE] = { 0, };
+	//TODO:
+	//char UserID[MAX_USER_ID_SIZE] = { 0, };
+	long long uniqueId;
+	short msgLen;
 	wchar_t Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
 };
 #pragma pack(pop)

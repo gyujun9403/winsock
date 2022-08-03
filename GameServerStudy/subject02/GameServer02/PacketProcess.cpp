@@ -147,8 +147,11 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 			else
 			{
 				pktRes.SetError(ERROR_CODE::NONE);
+				//TODO:
+				pktRes.UniqueId = user->GetIndex();
 				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				room->Enter(user);
+				room->BroadCastOtherJoin(user);
 				std::cout << packetInfo.SessionIndex << " enter" << std::endl;
 				return ERROR_CODE::NONE;
 			}
@@ -204,9 +207,13 @@ ERROR_CODE PacketProcess::ChatInRoom(PacketInfo packetInfo)
 		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
 		return ERROR_CODE::ROOM_NO_ROOM_TO_CHAT;
 	}
-	std::wstring wMsg = pktReq->Msg;
-	std::string msg(wMsg.begin(), wMsg.end());
-	room->BroadCastOtherChat(user, msg);
+	//std::wstring wMsg;
+	//TODO:
+	//wMsg.assign(pktReq->Msg, 0, pktReq->Msglen);
+	std::string Msg;
+	//std::string msg(Msg.begin(), Msg.end());
+	Msg.assign(pktReq->Msg, 0, pktReq->Msglen);
+	room->BroadCastOtherChat(user, Msg); // 해당 유저도 포함해야할듯?
 	pktRes.SetError(ERROR_CODE::NONE);
 	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
 	return ERROR_CODE::NONE;
