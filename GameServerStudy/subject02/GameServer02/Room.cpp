@@ -44,10 +44,10 @@ void Room::BroadCastOtherJoin(User* other)
 	memcpy(pktRes.UserID, other->GetId().c_str(), pktRes.idlen);
 	for (User* element : this->m_UserList)
 	{
-		if (element != other)
-		{
-			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomLeaveRes), (char*)&pktRes);
-		}
+		//if (element != other)
+		//{
+			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomEnterUserInfoNtf), (char*)&pktRes);
+		//}
 	}
 }
 
@@ -59,10 +59,10 @@ void Room::BroadCastOtherLeave(User* other)
 	//memcpy(, other->GetIndex(), sizeof());
 	for (User* element : this->m_UserList)
 	{
-		if (element != other)
-		{
-			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_LEAVE_USER_NTF, sizeof(PktRoomLeaveRes), (char*)&pktRes);
-		}
+		//if (element != other)
+		//{
+			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_LEAVE_USER_NTF, sizeof(PktRoomLeaveUserInfoNtf), (char*)&pktRes);
+		//}
 	}
 }
 
@@ -73,13 +73,12 @@ void Room::BroadCastOtherChat(User* other, std::string msg)
 	pktRes.uniqueId = other->GetIndex();
 	pktRes.msgLen = msg.size();
 	memcpy(pktRes.Msg, msg.c_str(), msg.size());
-	std::cout << "chat(" << msg.size() << ") :" << msg << std::endl;
 	//memcpy(pktRes.UserID, other->GetId().c_str(), other->GetId().size());
 	for (User* element : this->m_UserList)
 	{
 		//if (element != other)
-		{
+		//{
 			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_CHAT_NTF, sizeof(PktRoomChatNtf), (char*)&pktRes);
-		}
+		//}
 	}
 }

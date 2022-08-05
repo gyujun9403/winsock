@@ -146,8 +146,8 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 			}
 			else
 			{
-				pktRes.SetError(ERROR_CODE::NONE);
 				//TODO:
+				pktRes.SetError(ERROR_CODE::NONE);
 				pktRes.UniqueId = user->GetIndex();
 				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				room->Enter(user);
@@ -180,10 +180,10 @@ ERROR_CODE PacketProcess::LeaveRoom(PacketInfo packetInfo)
 	}
 	else
 	{
-		userEnteredRoom->Leave(user);
 		userEnteredRoom->BroadCastOtherLeave(user);
 		pktRes.SetError(ERROR_CODE::NONE);
 		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(PktRoomLeaveRes), (char*)&pktRes);
+		userEnteredRoom->Leave(user);
 		return ERROR_CODE::NONE;
 	}
 }
