@@ -69,7 +69,8 @@ void Room::BroadCastOtherLeave(User* other)
 	PktRoomLeaveUserInfoNtf pktRes;
 
 	pktRes.uniqueId = other->GetIndex();
-	//memcpy(, other->GetIndex(), sizeof());
+	pktRes.idlen = other->GetId().size();
+	memcpy(pktRes.UserID, other->GetId().c_str(), pktRes.idlen);
 	for (User* element : this->m_UserList)
 	{
 		//if (element != other)

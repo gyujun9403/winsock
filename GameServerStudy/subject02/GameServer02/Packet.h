@@ -73,6 +73,8 @@ struct PktRoomLeaveUserInfoNtf
 	// TODO:
 	//char UserId[MAX_USER_ID_SIZE] = { 0, };
 	long long uniqueId;
+	char idlen;
+	char UserID[MAX_USER_ID_SIZE];
 };
 
 // 룸 채팅 메세지의 최대 사이즈.
