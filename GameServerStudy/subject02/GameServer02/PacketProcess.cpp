@@ -152,6 +152,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 				this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_ENTER_RES, sizeof(PktRoomEnterRes), (char*)&pktRes);
 				room->Enter(user);
 				room->BroadCastOtherJoin(user);
+				room->GetListOtherUser(user);
 				std::cout << packetInfo.SessionIndex << " enter" << std::endl;
 				return ERROR_CODE::NONE;
 			}

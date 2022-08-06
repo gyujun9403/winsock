@@ -44,10 +44,23 @@ void Room::BroadCastOtherJoin(User* other)
 	memcpy(pktRes.UserID, other->GetId().c_str(), pktRes.idlen);
 	for (User* element : this->m_UserList)
 	{
-		//if (element != other)
-		//{
+		if (element != other)
+		{
 			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomEnterUserInfoNtf), (char*)&pktRes);
-		//}
+		}
+	}
+}
+
+void Room::GetListOtherUser(User* other)
+{
+	PktRoomEnterUserInfoNtf pktRes;
+
+	for (User* element : this->m_UserList)
+	{
+		pktRes.uniqueId = element->GetIndex();
+		pktRes.idlen = (char)element->GetId().size();
+		memcpy(pktRes.UserID, element->GetId().c_str(), pktRes.idlen);
+		this->m_pRefNetwork->SendData(other->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomEnterUserInfoNtf), (char*)&pktRes);
 	}
 }
 

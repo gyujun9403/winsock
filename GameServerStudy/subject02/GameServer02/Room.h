@@ -47,6 +47,7 @@ public:
 	void BroadCastOtherJoin(User* other);
 	void BroadCastOtherLeave(User* other);
 	void BroadCastOtherChat(User* other, std::string msg);
+	void GetListOtherUser(User* other);
 
 private:
 	ILog* m_pRefLogger;
