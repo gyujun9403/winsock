@@ -42,10 +42,13 @@ void Room::BroadCastOtherJoin(User* other)
 	pktRes.uniqueId = other->GetIndex();
 	pktRes.idlen = (char)other->GetId().size();
 	memcpy(pktRes.UserID, other->GetId().c_str(), pktRes.idlen);
+
 	for (User* element : this->m_UserList)
 	{
 		if (element != other)
 		{
+			// TODO: 테스트를 위해서라도 함수/클래스를 세분화 할 필요 있음.
+			// TODO: SendData하나만을 위해 Network객체를 가지고 있을 필요는 없다. 함수포인터 등을 이용해서 해당 함수만 가져오거나... 싱글톤? 아무튼 전역에서 사용할 수 있게...
 			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomEnterUserInfoNtf), (char*)&pktRes);
 		}
 	}

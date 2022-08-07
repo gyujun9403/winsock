@@ -153,6 +153,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 				room->Enter(user);
 				room->BroadCastOtherJoin(user);
 				room->GetListOtherUser(user);
+				//TODO: 로그 쓰니까 혼용하지 말 것.
 				std::cout << packetInfo.SessionIndex << " enter" << std::endl;
 				return ERROR_CODE::NONE;
 			}

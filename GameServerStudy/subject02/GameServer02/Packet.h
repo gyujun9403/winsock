@@ -47,16 +47,27 @@ struct PktRoomEnterReq
 
 struct PktRoomEnterRes : PktBase
 {
+	// TODO: int64_t C++표준 사용하는게 좋다.
 	long long UniqueId;
 };
 
 struct PktRoomEnterUserInfoNtf
 {
+	//TODO:유저ID로 찾는거보단 빠르므로 최적화시 관리/최적화 요소 고려하여 선택. 
 	long long uniqueId;
 	char idlen;
 	char UserID[MAX_USER_ID_SIZE];
 };
 
+// TODO : 프로토콜 버퍼
+struct PktRoomUserListNtf
+{
+	char UserCount;
+	char UserID1[MAX_USER_ID_SIZE];
+	char UserID2[MAX_USER_ID_SIZE];
+	char UserID3[MAX_USER_ID_SIZE];
+	char UserID4[MAX_USER_ID_SIZE];
+};
 // 유저 정보가 있는것도 있고 없는것도 있는데 뭐지
 // 헤더 정보도 없는거 같은데
 
@@ -99,6 +110,7 @@ struct PktRoomChatNtf
 	//TODO:
 	//char UserID[MAX_USER_ID_SIZE] = { 0, };
 	long long uniqueId;
+	// TODO: 상용코드에서는 다른방식 사용 필요.
 	short msgLen;
 	wchar_t Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
 };
