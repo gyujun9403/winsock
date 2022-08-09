@@ -36,6 +36,7 @@ public:
 	ERROR_CODE EnterRoom(PacketInfo packetInfo);
 	ERROR_CODE LeaveRoom(PacketInfo packetInfo);
 	ERROR_CODE ChatInRoom(PacketInfo packetInfo);
+	ERROR_CODE OmokPlaceStone(PacketInfo packetInfo);
 // ตฅภฬลอ
 public:
 	ILog* refLogger_;

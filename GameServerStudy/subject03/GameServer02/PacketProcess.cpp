@@ -53,6 +53,9 @@ void PacketProcess::Process(PacketInfo packetInfo)
 		case static_cast<int>(commonPacketId::ROOM_CHAT_REQ):
 			this->ChatInRoom(packetInfo);
 			break;
+		case static_cast<int>(commonPacketId::OMOK_PLACE_STONE_REQ):
+			this->OmokPlaceStone(packetInfo);
+			break;
 	}
 
 }
@@ -199,5 +202,19 @@ ERROR_CODE PacketProcess::ChatInRoom(PacketInfo packetInfo)
 	room->BroadCastOtherChat(user, Msg);
 	pktRes.SetError(ERROR_CODE::NONE);
 	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_CHAT_RES, sizeof(PktRoomChatRes), (char*)&pktRes);
+	return ERROR_CODE::NONE;
+}
+
+ERROR_CODE PacketProcess::OmokPlaceStone(PacketInfo packetInfo)
+{
+	PktPlaceStoneReq* pktReq = reinterpret_cast<PktPlaceStoneReq*>(packetInfo.pRefData);
+	PktPlaceStoneRes pktRes;
+	PktPlaceStoneNtf pktNtf;
+	pktRes.SetError(ERROR_CODE::NONE);
+	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
+	pktNtf.color = true;
+	pktNtf.x = pktReq->x;
+	pktNtf.y = pktReq->y;
+	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
 	return ERROR_CODE::NONE;
 }

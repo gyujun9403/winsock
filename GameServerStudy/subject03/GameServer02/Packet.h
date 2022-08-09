@@ -93,4 +93,23 @@ struct PktRoomChatNtf
 	short msgLen;
 	wchar_t Msg[MAX_ROOM_CHAT_MSG_SIZE] = { 0, };
 };
+
+// 오목 패킷들
+struct PktPlaceStoneReq
+{
+	int x;
+	int y;
+};
+
+struct PktPlaceStoneRes : PktBase
+{
+
+};
+
+struct PktPlaceStoneNtf
+{
+	int x;
+	int y;
+	bool color;
+};
 #pragma pack(pop)
