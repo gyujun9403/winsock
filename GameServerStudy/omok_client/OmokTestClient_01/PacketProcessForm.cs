@@ -23,6 +23,7 @@ namespace csharp_test_client
             PacketFuncDic.Add(PACKET_ID.ROOM_CHAT_NOTIFY, PacketProcess_RoomChatNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_RES, PacketProcess_PlaceStoneResponse);
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_NTF, PacketProcess_PlaceStoneNotify);
+            PacketFuncDic.Add(PACKET_ID.OMOK_RESULT_NTF, PacketProcess_GameResultNotify);
             //PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_RELAY_NTF, PacketProcess_RoomRelayNotify);
         }
 
@@ -201,6 +202,22 @@ namespace csharp_test_client
 
             notifyPkt.FromBytes(BodyData);
             placeStoneAt(notifyPkt.X, notifyPkt.Y, notifyPkt.color);
+        }
+
+        void PacketProcess_GameResultNotify(byte[] BodyData)
+        {
+            var notifyPkt = new GameResultNtfPacket();  
+
+            notifyPkt.FromBytes(BodyData);
+            if (notifyPkt.result == true)
+            {
+                DevLog.Write("You WIN!!!!");
+            }
+            else
+            {
+                DevLog.Write("허접 ㅋㅋ");
+            }
+            DrawBoard(); //이렇게 막 가지고 와도 되나?
         }
     }
 }

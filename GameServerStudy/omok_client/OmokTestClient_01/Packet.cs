@@ -328,4 +328,16 @@ namespace csharp_test_client
             return true;
         }
     }
+
+    public class GameResultNtfPacket
+    {
+        public bool result;
+
+        public bool FromBytes(byte[] bodyData)
+        {
+            result = BitConverter.ToBoolean(bodyData, 0);
+
+            return true;
+        }
+    }
 }

@@ -112,4 +112,9 @@ struct PktPlaceStoneNtf
 	int y;
 	bool color;
 };
+
+struct PktGameResultNtf
+{
+	bool result;
+};
 #pragma pack(pop)

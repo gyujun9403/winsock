@@ -47,6 +47,9 @@ namespace csharp_test_client
         OMOK_PLACE_STONE_NTF = 83,
         //PACKET_ID_ERROR_NTF = 703,
 
+        //승리 패배
+        OMOK_RESULT_NTF = 100,
+
         // Ping(Heart-beat)
         //PING_REQ = 706,
         //PING_RES = 707,
