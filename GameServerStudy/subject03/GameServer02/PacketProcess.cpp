@@ -145,6 +145,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 				room->Enter(user);
 				room->BroadCastOtherJoin(user);
 				room->GetListOtherUser(user);
+				// TODO: 게임 유저 추가 로직.
 				return ERROR_CODE::NONE;
 			}
 		}
@@ -174,6 +175,7 @@ ERROR_CODE PacketProcess::LeaveRoom(PacketInfo packetInfo)
 		pktRes.SetError(ERROR_CODE::NONE);
 		this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::ROOM_LEAVE_RES, sizeof(PktRoomLeaveRes), (char*)&pktRes);
 		userEnteredRoom->Leave(user);
+		// TODO: 게임 유저 제거 로직.
 		return ERROR_CODE::NONE;
 	}
 }
@@ -207,14 +209,15 @@ ERROR_CODE PacketProcess::ChatInRoom(PacketInfo packetInfo)
 
 ERROR_CODE PacketProcess::OmokPlaceStone(PacketInfo packetInfo)
 {
-	PktPlaceStoneReq* pktReq = reinterpret_cast<PktPlaceStoneReq*>(packetInfo.pRefData);
-	PktPlaceStoneRes pktRes;
-	PktPlaceStoneNtf pktNtf;
-	pktRes.SetError(ERROR_CODE::NONE);
-	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
-	pktNtf.color = true;
-	pktNtf.x = pktReq->x;
-	pktNtf.y = pktReq->y;
-	this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
-	return ERROR_CODE::NONE;
+	//PktPlaceStoneReq* pktReq = reinterpret_cast<PktPlaceStoneReq*>(packetInfo.pRefData);
+	//PktPlaceStoneRes pktRes;
+	//PktPlaceStoneNtf pktNtf;
+	//pktRes.SetError(ERROR_CODE::NONE);
+	//this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
+	//pktNtf.color = true;
+	//pktNtf.x = pktReq->x;
+	//pktNtf.y = pktReq->y;
+	//this->refNetwork_->SendData(packetInfo.SessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
+	//return ERROR_CODE::NONE;
+	this->refRoomMgr_->GetRoomUserEntered(packetInfo.SessionIndex())->OmokPlaceStone
 }

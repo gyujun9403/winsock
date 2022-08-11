@@ -113,6 +113,22 @@ struct PktPlaceStoneNtf
 	bool color;
 };
 
+struct PktReadyReq
+{
+	bool isReady;
+};
+
+struct PktReadyRes : PktBase
+{
+
+};
+
+struct PktReadyNtf
+{
+	int64_t uniqueId;
+	bool isReady;
+};
+
 struct PktGameResultNtf
 {
 	bool result;

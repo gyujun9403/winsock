@@ -1,6 +1,7 @@
 ﻿#include <algorithm>
 #include <cstring>
 #include <wchar.h>
+#include <iostream>
 
 #include "NetLib/ILog.h"
 #include "NetLib/TcpNetwork.h"
@@ -8,7 +9,7 @@
 #include "ErrorCode.h"
 #include "User.h"
 #include "Room.h"
-#include <iostream>
+#include "Game.h"
 
 
 Room::Room() {}
@@ -63,6 +64,19 @@ void Room::GetListOtherUser(User* other)
 		memcpy(pktRes.UserID, element->GetId().c_str(), pktRes.idlen);
 		this->m_pRefNetwork->SendData(other->GetSessionIndex(), (short)PACKET_ID::ROOM_ENTER_NEW_USER_, sizeof(PktRoomEnterUserInfoNtf), (char*)&pktRes);
 	}
+}
+
+void Room::OmokReadyUser(User* user)
+{
+	 this->m_pGame->ReadyGame
+}
+
+void Room::OmokPlaceStone(User* user, int32_t x, int32_t y)
+{
+}
+
+void Room::OmokLeaveOther(User* user)
+{
 }
 
 void Room::BroadCastOtherLeave(User* other)

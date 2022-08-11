@@ -1,33 +1,44 @@
-#include "Game.h"
 #include <string.h>
-
-// 이친구는 패킷으로 인해 불리는 친구가 이니므로.. 예외처리는 크게 하지 않는다 ->  이친구를 부를때는 이미 밖에서 확인을 다 했음.
-// 이렇게 하지 말고... ReadyGame를 통합해서, ready 한 친구만 넘겨주게 하는 건? ready 취소 할 때는 nullptr
-ERROR_CODE Game::NewGame(User* p1, User* P2)
-{
-	this->p1 = p1;
-	this->p2 = p2;
-	this->gameStatus = GAMESTATUS::WAITING;
-	return ERROR_CODE::NONE;
-}
+#include "Game.h"
+#include "User.h"
+#include "Packet.h"
+#include "PacketID.h"
 
 void Game::ResetBoard()
 {
 	memset(this->board, 0, sizeof(this->board));
-	this->turn != this->turn;
+	this->color != this->color;
 	this->gameStatus = GAMESTATUS::WAITING;
 	this->p1 = nullptr;
 	this->p2 = nullptr;
 }
 
-ERROR_CODE Game::ReadyGame(User* user)
+void Game::SendReadyRes(int sessionIndex, ERROR_CODE code)
 {
+	PktReadyRes pktRes;
+
+	pktRes.SetError(code);
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
+}
+
+void Game::SendReadyNtf(int sessionIndex, bool isReady)
+{
+	PktReadyNtf pktNtf;
+
+	pktNtf.uniqueId = sessionIndex;
+	pktNtf.isReady = isReady;
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_READY_NTF, sizeof(PktReadyNtf), (char*)&pktNtf);
+}
+
+void Game::ReadyGame(User* user, bool isReady)
+{
+	ERROR_CODE code = ERROR_CODE::NONE;
 	// 유저 인덱스가 맞는지(방에 포함되어 있는지) -> 이건 밖에서 확인하기. 안해도 됨.
 	// 유저가 레디 가능한 상태인지 -> 게임중/대기중 불가. 아이콘을 disable로 만드는건?
-	if (this->gameStatus != WAITING)
+	if (this->gameStatus != GAMESTATUS::WAITING)
 	{
 		// waiting 상태가 아닌데 ready를 함 -> 문제가 있음.
-		return ERROR_CODE::NONE;
+		code = ERROR_CODE::OMOK_CANT_READY;
 	}
 	else
 	{
@@ -40,46 +51,61 @@ ERROR_CODE Game::ReadyGame(User* user)
 			p2 = user;
 			this->gameStatus = GAMESTATUS::RUNNING;
 		}
-		return ERROR_CODE::NONE;
+		this->SendReadyNtf(user->GetSessionIndex(), isReady);
 	}
+	this->SendReadyRes(user->GetSessionIndex(), code);
 }
 
-ERROR_CODE Game::PlaceStone(User* user, int32_t x, int32_t y)
+void Game::SendPlaceStoneRes(int sessionIndex, ERROR_CODE code)
 {
+	PktPlaceStoneRes pktRes;
+
+	pktRes.SetError(code);
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
+}
+
+void Game::SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color)
+{
+	PktPlaceStoneNtf pktNtf;
+	pktNtf.color = true;
+	pktNtf.x = x;
+	pktNtf.y = y;
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
+}
+
+void Game::PlaceStone(User* user, int32_t x, int32_t y)
+{
+	ERROR_CODE code = ERROR_CODE::NONE;
+
 	if (this->board[x][y] == 0)
 	{
 		if (user == this->p1)
 		{
 			this->board[x][y] = 1;
-			//돌 놓기 성공 res반환.
-			//this->network_->SendData(); 돌 놓기 ntf send. 색으로 this->turn을 그대로 보냄.
-			// Ntf반환
+			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, true);
 		}
 		else if (user == this->p2)
 		{
 			this->board[x][y] = 2;
-			//돌 놓기 성공 res반환.
-			//this->network_->SendData(); 돌 놓기 ntf send. 색으로 this->turn을 뒤집어서 보냄.
-			// Ntf반환
+			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, false);
 		}
-		else
-		{
-			//TODO: this->network->SendData();
-			return ERROR_CODE::USER_MGR_NOT_CONFIRM_USER;
-		}
+		//else
+		//{
+		//	//TODO: this->network->SendData();
+		//	return ERROR_CODE::USER_MGR_NOT_CONFIRM_USER;
+		//} ->  짜치  room에서 확인해서 보내줄거임.
 	}
 	else
 	{
-		// 이미 놓아진 자리 애러
-		// TODO: return;
+		code = ERROR_CODE::OMOK_PLACE_OCCUFIED;
 	}
-	return ERROR_CODE::NONE;
+	SendPlaceStoneRes(user->GetSessionIndex(), code);
 }
 
 bool Game::AnalyzeBoard()
 {
 	// 승리 조건 만족시 return true;
-	this->gameStatus = GAMESTATUS::SHIFING;
+	this->gameStatus = GAMESTATUS::SHIFTING;
 	return false;
 }
 
@@ -92,7 +118,7 @@ void Game::MakeWin(User* user)
 //	return this->isGaming;
 //}
 
-GAMESTATUS getGameStatus()
+GAMESTATUS Game::getGameStatus()
 {
 	return this->gameStatus;
 }
