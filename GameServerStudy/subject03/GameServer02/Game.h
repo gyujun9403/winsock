@@ -11,7 +11,7 @@ class User;
 
 using Network = NServerNetLib::ITcpNetwork;
 
-enum class GAMESTATUS
+enum class GAMESTATUS : short
 {
 	WAITING = 0,
 	RUNNING = 1,
@@ -23,17 +23,20 @@ class Game
 public:
 	ERROR_CODE NewGame(User* p1, User* P2); // 유저세팅. 
 	void ResetBoard(); // 오목판 비우기
-	ERROR_CODE ReadyGame(User* user); // 게임 시작. -> 둘 다 레디, 
+	ERROR_CODE ReadyGame(User* user); // 게임 시작. -> 둘 다 레디,
+	ERROR_CODE UnReadyGame(User* user);
 	ERROR_CODE PlaceStone(User* user, int32_t x, int32_t y);
 	bool AnalyzeBoard(); // true반환시 방을 리셋.
 	void MakeWin(User* user); // 누가 나가면, 그사람 승리하게 만듦.
+	GAMESTATUS getGameStatus();
 	//bool IsGaming(); // 게임중인지 아닌지 표시.
 private:
+// 타이머 필요할듯.
 	User* p1;
 	User* p2;
 	short board[18][18]; 
 	GAMESTATUS gameStatus;
-	bool turn; // false : 1p, ture : 2p
+	bool color; // false : 1p, ture : 2p
 	Network* network;
 };
 

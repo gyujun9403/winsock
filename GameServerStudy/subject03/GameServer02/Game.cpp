@@ -15,14 +15,33 @@ void Game::ResetBoard()
 {
 	memset(this->board, 0, sizeof(this->board));
 	this->turn != this->turn;
+	this->gameStatus = GAMESTATUS::WAITING;
+	this->p1 = nullptr;
+	this->p2 = nullptr;
 }
 
 ERROR_CODE Game::ReadyGame(User* user)
 {
 	// 유저 인덱스가 맞는지(방에 포함되어 있는지) -> 이건 밖에서 확인하기. 안해도 됨.
 	// 유저가 레디 가능한 상태인지 -> 게임중/대기중 불가. 아이콘을 disable로 만드는건?
-
-	return ERROR_CODE();
+	if (this->gameStatus != WAITING)
+	{
+		// waiting 상태가 아닌데 ready를 함 -> 문제가 있음.
+		return ERROR_CODE::NONE;
+	}
+	else
+	{
+		if (p1 != nullptr)
+		{
+			p1 = user;
+		}
+		else
+		{
+			p2 = user;
+			this->gameStatus = GAMESTATUS::RUNNING;
+		}
+		return ERROR_CODE::NONE;
+	}
 }
 
 ERROR_CODE Game::PlaceStone(User* user, int32_t x, int32_t y)
@@ -32,16 +51,20 @@ ERROR_CODE Game::PlaceStone(User* user, int32_t x, int32_t y)
 		if (user == this->p1)
 		{
 			this->board[x][y] = 1;
+			//돌 놓기 성공 res반환.
+			//this->network_->SendData(); 돌 놓기 ntf send. 색으로 this->turn을 그대로 보냄.
 			// Ntf반환
 		}
 		else if (user == this->p2)
 		{
 			this->board[x][y] = 2;
+			//돌 놓기 성공 res반환.
+			//this->network_->SendData(); 돌 놓기 ntf send. 색으로 this->turn을 뒤집어서 보냄.
 			// Ntf반환
 		}
 		else
 		{
-			//TODO: this->network->SendData()
+			//TODO: this->network->SendData();
 			return ERROR_CODE::USER_MGR_NOT_CONFIRM_USER;
 		}
 	}
@@ -56,6 +79,7 @@ ERROR_CODE Game::PlaceStone(User* user, int32_t x, int32_t y)
 bool Game::AnalyzeBoard()
 {
 	// 승리 조건 만족시 return true;
+	this->gameStatus = GAMESTATUS::SHIFING;
 	return false;
 }
 
@@ -67,3 +91,8 @@ void Game::MakeWin(User* user)
 //{
 //	return this->isGaming;
 //}
+
+GAMESTATUS getGameStatus()
+{
+	return this->gameStatus;
+}
