@@ -59,5 +59,7 @@ private:
 	bool m_IsUsed = false;
 	std::vector<User*> m_UserList;
 
+	// Room 에서 Game관련 조작 기능을 추가해주어야 할 것 같다... -> 모든 함수들이 유저의 fd값(세션 번호)랑 패킷 그대로 넣고, 특정 함수를 호출하는 함수들. -> game의 함수들보다 더 간단하게 사용 가능하게.
+	// 외부에서는 
 	//Game* m_pGame = nullptr;
 };
