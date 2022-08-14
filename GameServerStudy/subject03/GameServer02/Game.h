@@ -21,10 +21,11 @@ enum class GAMESTATUS : short
 class Game
 {
 public:
-	void ResetBoard(); // 오목판 비우기
+	void setNetwork(Network* net);
+	void ClearBoard(); // 오목판 비우기
 	void ReadyGame(User* user, bool isReady); // 게임 시작. -> 둘 다 레디,
 	void PlaceStone(User* user, int32_t x, int32_t y);
-	bool AnalyzeBoard(); // true반환시 방을 리셋.
+	int16_t AnalyzeBoard(); // true반환시 방을 리셋.
 	void MakeWin(User* user); // 누가 나가면, 그사람 승리하게 만듦.
 	GAMESTATUS getGameStatus();
 	//bool IsGaming(); // 게임중인지 아닌지 표시.
@@ -32,9 +33,10 @@ private:
 // 타이머 필요할듯.
 	User* p1;
 	User* p2;
-	short board[18][18]; 
+	int16_t board[19][19];
+	int16_t cntStone = 0;
+	bool turn = false;
 	GAMESTATUS gameStatus;
-	bool color; // false : 1p, ture : 2p
 	Network* network;
 	void SendReadyRes(int sessionIndex, ERROR_CODE code);
 	void SendReadyNtf(int sessionIndex, bool isReady);

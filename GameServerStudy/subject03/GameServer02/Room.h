@@ -49,7 +49,8 @@ public:
 	void BroadCastOtherChat(User* other, std::string msg);
 	void GetListOtherUser(User* other);
 	//
-	void OmokReadyUser(User* user);
+	void BroadCastResult(int16_t winner);
+	void OmokReadyUser(User* user, bool isReady);
 	void OmokPlaceStone(User* user, int32_t x, int32_t y);
 	void OmokLeaveOther(User* user);
 

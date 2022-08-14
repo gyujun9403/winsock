@@ -331,12 +331,15 @@ namespace csharp_test_client
 
     public class GameResultNtfPacket
     {
-        public bool result;
+        Int16 idLen;
+        public string UserID;
 
         public bool FromBytes(byte[] bodyData)
         {
-            result = BitConverter.ToBoolean(bodyData, 0);
-
+            var readPos = 0;
+            idLen = BitConverter.ToInt16(bodyData, readPos);
+            readPos += sizeof(Int16);
+            UserID = BitConverter.ToString(bodyData, readPos, idLen);
             return true;
         }
     }

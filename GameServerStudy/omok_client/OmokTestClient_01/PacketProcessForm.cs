@@ -204,19 +204,17 @@ namespace csharp_test_client
             placeStoneAt(notifyPkt.X, notifyPkt.Y, notifyPkt.color);
         }
 
+        void PacketProcess_GameResultResponse(byte[] BodyData)
+        { 
+        }
+
         void PacketProcess_GameResultNotify(byte[] BodyData)
         {
-            var notifyPkt = new GameResultNtfPacket();  
+            GameResultNtfPacket notifyPkt = new GameResultNtfPacket();
 
             notifyPkt.FromBytes(BodyData);
-            if (notifyPkt.result == true)
-            {
-                DevLog.Write("You WIN!!!!");
-            }
-            else
-            {
-                DevLog.Write("허접 ㅋㅋ");
-            }
+            var msg = "winner is " + notifyPkt.UserID + "!!!"; 
+            DevLog.Write(msg, LOG_LEVEL.ERROR);
             DrawBoard(); //이렇게 막 가지고 와도 되나?
         }
     }

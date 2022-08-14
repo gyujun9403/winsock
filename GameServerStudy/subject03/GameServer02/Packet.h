@@ -129,8 +129,13 @@ struct PktReadyNtf
 	bool isReady;
 };
 
+struct PktGameResetNtf
+{
+};
+
 struct PktGameResultNtf
 {
-	bool result;
+	int16_t idLen;
+	char UserID[MAX_USER_ID_SIZE];
 };
 #pragma pack(pop)

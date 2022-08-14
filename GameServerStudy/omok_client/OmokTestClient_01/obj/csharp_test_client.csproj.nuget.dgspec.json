@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj": {}
+    "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj": {}
   },
   "projects": {
-    "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj": {
+    "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
+        "projectUniqueName": "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
         "projectName": "csharp_test_client",
-        "projectPath": "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
+        "projectPath": "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
         "packagesPath": "C:\\Users\\gujun\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\obj\\",
+        "outputPath": "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

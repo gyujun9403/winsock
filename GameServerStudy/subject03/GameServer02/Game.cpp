@@ -4,13 +4,24 @@
 #include "Packet.h"
 #include "PacketID.h"
 
-void Game::ResetBoard()
+void Game::setNetwork(Network* net)
 {
+	this->network = net;
+	this->turn = true;
+}
+
+void Game::ClearBoard()
+{
+	PktGameResetNtf pktNtf;
+
 	memset(this->board, 0, sizeof(this->board));
-	this->color != this->color;
 	this->gameStatus = GAMESTATUS::WAITING;
+	this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_CLEAR_BOARD_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
+	this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_CLEAR_BOARD_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
 	this->p1 = nullptr;
 	this->p2 = nullptr;
+	this->turn = true;
+	cntStone = 0;
 }
 
 void Game::SendReadyRes(int sessionIndex, ERROR_CODE code)
@@ -18,7 +29,7 @@ void Game::SendReadyRes(int sessionIndex, ERROR_CODE code)
 	PktReadyRes pktRes;
 
 	pktRes.SetError(code);
-	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_RES, sizeof(PktPlaceStoneRes), (char*)&pktRes);
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_READY_RES, sizeof(PktReadyRes), (char*)&pktRes);
 }
 
 void Game::SendReadyNtf(int sessionIndex, bool isReady)
@@ -42,7 +53,7 @@ void Game::ReadyGame(User* user, bool isReady)
 	}
 	else
 	{
-		if (p1 != nullptr)
+		if (p1 == nullptr)
 		{
 			p1 = user;
 		}
@@ -67,7 +78,7 @@ void Game::SendPlaceStoneRes(int sessionIndex, ERROR_CODE code)
 void Game::SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color)
 {
 	PktPlaceStoneNtf pktNtf;
-	pktNtf.color = true;
+	pktNtf.color = color;
 	pktNtf.x = x;
 	pktNtf.y = y;
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
@@ -77,18 +88,31 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
 
-	if (this->board[x][y] == 0)
+	if (this->p1 == nullptr || this->p2 == nullptr)
 	{
-		if (user == this->p1)
+		code = ERROR_CODE::OMOK_GAME_NOT_STARTED;
+	}
+	else if (x < 0 || x > 19 || y < 0 || y > 19)
+	{
+		code = ERROR_CODE::OMOK_NOT_VALIED_PLACE;
+	}
+	else if (this->board[x][y] == 0)
+	{
+		if (user == this->p1 && turn == true)
 		{
 			this->board[x][y] = 1;
 			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, true);
+			SendPlaceStoneNtf(p2->GetSessionIndex(), x, y, true);
+			turn = false;
 		}
-		else if (user == this->p2)
+		else if (user == this->p2 && turn == false)
 		{
 			this->board[x][y] = 2;
+			SendPlaceStoneNtf(p1->GetSessionIndex(), x, y, false);
 			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, false);
+			turn = true;
 		}
+		cntStone++;
 		//else
 		//{
 		//	//TODO: this->network->SendData();
@@ -102,11 +126,26 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 	SendPlaceStoneRes(user->GetSessionIndex(), code);
 }
 
-bool Game::AnalyzeBoard()
+int16_t Game::AnalyzeBoard()
 {
 	// 승리 조건 만족시 return true;
-	this->gameStatus = GAMESTATUS::SHIFTING;
-	return false;
+	if (cntStone > 10)
+	{
+
+		this->gameStatus = GAMESTATUS::SHIFTING;
+		if (turn == true)
+		{
+			return 1;
+
+		}
+		else
+		{
+			return 2;
+		}
+		// 비길시 return -1
+		ClearBoard();
+	}
+	return 0;
 }
 
 void Game::MakeWin(User* user)

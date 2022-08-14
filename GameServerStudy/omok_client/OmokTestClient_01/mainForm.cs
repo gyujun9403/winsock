@@ -34,6 +34,7 @@ namespace csharp_test_client
         int 눈Size = 30; // gridSize
         int 돌Size = 28; // stoneSize
         int 화점Size = 10; // flowerSize
+        Int16[,] board = new Int16[19, 19];
 
         public mainForm()
         {
@@ -375,6 +376,7 @@ namespace csharp_test_client
         private void panel1_Paint(object sender, PaintEventArgs e)
         {
             DrawBoard();
+            drawAllStones();
         }
 
         private void DrawBoard()
@@ -416,12 +418,46 @@ namespace csharp_test_client
                 }
         }
 
+        private void drawAllStones()
+        {
+            for (Int16 x = 0; x < 19; x++)
+            {
+                for (Int16 y = 0; y < 19; y++)
+                {
+                    if (board[x, y] == 0)
+                    {
+                        continue ;
+                    }
+                    Rectangle r = new Rectangle(
+                      margin + 눈Size * x - 돌Size / 2,
+                      margin + 눈Size * y - 돌Size / 2,
+                      돌Size, 돌Size);
+                    if (board[x, y] == 1)
+                    {
+                        g.FillEllipse(wBrush, r);
+                    }
+                    else if (board[x, y] == 2)
+                    {
+                        g.FillEllipse(bBrush, r);
+                    }
+                }
+            }
+        }
+
         private void placeStoneAt(Int32 x, Int32 y, bool color)
         {
             Rectangle r = new Rectangle(
               margin + 눈Size * x - 돌Size / 2,
               margin + 눈Size * y - 돌Size / 2,
               돌Size, 돌Size);
+            if (color == true)
+            {
+                board[x, y] = 1;
+            }
+            else
+            {
+                board[x, y] = 2;
+            }
             if (color == false)
             {
                 g.FillEllipse(bBrush, r);
