@@ -276,6 +276,16 @@ namespace csharp_test_client
 
     }
 
+    public class ReadyRequestPacket
+    {
+        bool isReady;
+
+        public byte[] ToBytes()
+        {
+            return BitConverter.GetBytes(isReady);
+        }
+    }
+
     public class PlacingStoneReqPacket
     {
         public Int32 X;

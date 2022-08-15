@@ -492,8 +492,14 @@ namespace csharp_test_client
             DevLog.Write($"돌 놓기 요청");
         }
 
-        private void btnRoomRelay_Click(object sender, EventArgs e)
+        private void textBoxRelay_TextChanged(object sender, EventArgs e)
         {
+
+        }
+
+        private void btnReady_Click(object sender, EventArgs e)
+        {
+            if ()
             //if( textBoxRelay.Text.IsEmpty())
             //{
             //    MessageBox.Show("릴레이 할 데이터가 없습니다");
@@ -503,6 +509,7 @@ namespace csharp_test_client
             //var bodyData = Encoding.UTF8.GetBytes(textBoxRelay.Text);
             //PostSendPacket(PACKET_ID.PACKET_ID_ROOM_RELAY_REQ, bodyData);
             //DevLog.Write($"방 릴레이 요청");
+
         }
 
     }

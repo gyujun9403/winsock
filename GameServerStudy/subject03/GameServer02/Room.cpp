@@ -120,11 +120,13 @@ void Room::BroadCastOtherChat(User* other, std::string msg)
 	}
 }
 
-void Room::BroadCastResult(int16_t winner)
+void Room::BroadCastResult(User* winner)
 {
 	PktGameResultNtf pktNtf;
 
-	pktNtf.result = winner;
+	pktNtf.idLen = winner->GetId().size();
+	memset(pktNtf.UserID, 0, MAX_USER_ID_SIZE);
+	memcpy(pktNtf.UserID, winner->GetId().c_str(), pktNtf.idLen);
 	for (User* element : this->m_UserList)
 	{
 		this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtf);
