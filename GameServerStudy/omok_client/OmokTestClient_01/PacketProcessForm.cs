@@ -24,6 +24,8 @@ namespace csharp_test_client
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_RES, PacketProcess_PlaceStoneResponse);
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_NTF, PacketProcess_PlaceStoneNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_RESULT_NTF, PacketProcess_GameResultNotify);
+            PacketFuncDic.Add(PACKET_ID.OMOK_READY_RES, PacketProcess_ReadyResponse);
+            
             //PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_RELAY_NTF, PacketProcess_RoomRelayNotify);
         }
 
@@ -216,6 +218,27 @@ namespace csharp_test_client
             var msg = "winner is " + notifyPkt.UserID + "!!!"; 
             DevLog.Write(msg, LOG_LEVEL.ERROR);
             DrawBoard(); //이렇게 막 가지고 와도 되나?
+        }
+
+        void PacketProcess_ReadyResponse(byte[] BodyData)
+        {
+            ReadyResponsePacket resPkt = new ReadyResponsePacket();
+
+            resPkt.FromBytes(BodyData);
+            setIsReady(resPkt.isReady);
+            if (resPkt.isReady == true)
+            {
+                btnReady.Text = "WAITING...";
+            }
+            else
+            {
+                btnReady.Text = "READY";
+            }
+        }
+
+        void PacketProcess_ReadyNotify(byte[] BodyData)
+        {
+
         }
     }
 }

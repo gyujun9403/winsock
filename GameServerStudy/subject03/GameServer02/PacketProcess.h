@@ -37,6 +37,7 @@ public:
 	ERROR_CODE LeaveRoom(PacketInfo packetInfo);
 	ERROR_CODE ChatInRoom(PacketInfo packetInfo);
 	ERROR_CODE OmokPlaceStone(PacketInfo packetInfo);
+	ERROR_CODE OmokReadyRequest(PacketInfo packetInfo);
 // ตฅภฬลอ
 public:
 	ILog* refLogger_;

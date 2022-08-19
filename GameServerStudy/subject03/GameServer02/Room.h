@@ -50,6 +50,7 @@ public:
 	void GetListOtherUser(User* other);
 	//
 	void BroadCastResult(User* winner);
+	void OmokEnterUser(User* user);
 	void OmokReadyUser(User* user, bool isReady);
 	void OmokPlaceStone(User* user, int32_t x, int32_t y);
 	void OmokLeaveOther(User* user);

@@ -278,11 +278,35 @@ namespace csharp_test_client
 
     public class ReadyRequestPacket
     {
-        bool isReady;
+        public bool isReady;
 
         public byte[] ToBytes()
         {
             return BitConverter.GetBytes(isReady);
+        }
+    }
+
+    public class ReadyResponsePacket
+    {
+        public bool isReady;
+
+        public bool FromBytes(byte[] bodyData)
+        {
+            isReady = BitConverter.ToBoolean(bodyData, 0);
+            return true;
+        }
+    }
+
+    public class ReadyNotificationPacket
+    {
+        public Int64 uniqueId;
+        public bool isReady;
+
+        public bool FromBytes(byte[] bodyData)
+        {
+            uniqueId = BitConverter.ToInt64(bodyData, 0);
+            isReady = BitConverter.ToBoolean(bodyData, 8);
+            return true;
         }
     }
 

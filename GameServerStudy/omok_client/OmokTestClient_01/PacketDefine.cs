@@ -45,6 +45,9 @@ namespace csharp_test_client
         OMOK_PLACE_STONE_REQ = 81,
         OMOK_PLACE_STONE_RES = 82,
         OMOK_PLACE_STONE_NTF = 83,
+        OMOK_READY_REQ = 84,
+        OMOK_READY_RES = 85,
+        OMOK_READY_NTF = 86,
         //PACKET_ID_ERROR_NTF = 703,
 
         //승리 패배

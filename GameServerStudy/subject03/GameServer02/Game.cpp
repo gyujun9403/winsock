@@ -10,6 +10,22 @@ void Game::setNetwork(Network* net)
 	this->turn = true;
 }
 
+void Game::EnterGame(User* user)
+{
+	if (this->p1 == nullptr)
+	{
+		this->p1 = user;
+	}
+	else if (this->p2 == nullptr)
+	{
+		this->p2 = user;
+	}
+	else
+	{
+		;
+	}
+}
+
 void Game::ClearBoard()
 {
 	PktGameResetNtf pktNtf;
@@ -51,20 +67,28 @@ void Game::ReadyGame(User* user, bool isReady)
 		// waiting 상태가 아닌데 ready를 함 -> 문제가 있음.
 		code = ERROR_CODE::OMOK_CANT_READY;
 	}
+	// p1 p2모두 있어야 ready가능
+	else if (p1 == nullptr || p2 == nullptr)
+	{
+		;
+	}
 	else
 	{
-		if (p1 == nullptr)
+		if (user == p1)
 		{
-			p1 = user;
+			this->p1Ready = isReady;
+			this->SendReadyRes(user->GetSessionIndex(), code);
+			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
+			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
-		else
+		else if (user == p2)
 		{
-			p2 = user;
-			this->gameStatus = GAMESTATUS::RUNNING;
+			this->p1Ready = isReady;
+			this->SendReadyRes(user->GetSessionIndex(), code);
+			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
+			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
-		this->SendReadyNtf(user->GetSessionIndex(), isReady);
 	}
-	this->SendReadyRes(user->GetSessionIndex(), code);
 }
 
 void Game::SendPlaceStoneRes(int sessionIndex, ERROR_CODE code)

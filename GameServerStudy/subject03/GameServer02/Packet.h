@@ -120,7 +120,7 @@ struct PktReadyReq
 
 struct PktReadyRes : PktBase
 {
-
+	bool isReady;
 };
 
 struct PktReadyNtf

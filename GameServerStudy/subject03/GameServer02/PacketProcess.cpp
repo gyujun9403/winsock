@@ -56,6 +56,9 @@ void PacketProcess::Process(PacketInfo packetInfo)
 		case static_cast<int>(commonPacketId::OMOK_PLACE_STONE_REQ):
 			this->OmokPlaceStone(packetInfo);
 			break;
+		case static_cast<int>(commonPacketId::OMOK_READY_REQ):
+			this->OmokReadyRequest(packetInfo);
+			break;
 	}
 
 }
@@ -146,7 +149,7 @@ ERROR_CODE PacketProcess::EnterRoom(PacketInfo packetInfo)
 				room->BroadCastOtherJoin(user);
 				room->GetListOtherUser(user);
 				// TODO: 게임 유저 추가 로직.
-				room->OmokReadyUser(user, true);
+				room->OmokEnterUser(user);
 				return ERROR_CODE::NONE;
 			}
 		}
@@ -230,4 +233,18 @@ ERROR_CODE PacketProcess::OmokPlaceStone(PacketInfo packetInfo)
 	}
 	this->refRoomMgr_->GetRoomUserEntered(user)->OmokPlaceStone(user, PktReq->x, PktReq->y);
 	return ERROR_CODE::NONE;
+}
+
+ERROR_CODE PacketProcess::OmokReadyRequest(PacketInfo packetInfo)
+{
+	PktReadyReq* PktReq;
+
+	PktReq = reinterpret_cast<PktReadyReq*>(packetInfo.pRefData);
+	User* user = std::get<1>(this->refUserMgr_->GetUser(packetInfo.SessionIndex));
+	if (user == nullptr)
+	{
+		return ERROR_CODE::NONE;
+	}
+	this->refRoomMgr_->GetRoomUserEntered(user)->OmokReadyUser(user, PktReq->isReady);
+	return ERROR_CODE();
 }

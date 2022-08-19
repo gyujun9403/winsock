@@ -35,6 +35,12 @@ namespace csharp_test_client
         int 돌Size = 28; // stoneSize
         int 화점Size = 10; // flowerSize
         Int16[,] board = new Int16[19, 19];
+        bool isReady = false;
+
+        public void setIsReady(bool ready)
+        {
+            isReady = ready;
+        }
 
         public mainForm()
         {
@@ -497,20 +503,22 @@ namespace csharp_test_client
 
         }
 
-        private void btnReady_Click(object sender, EventArgs e)
+        private void btnReady_Click_1(object sender, EventArgs e)
         {
-            if ()
-            //if( textBoxRelay.Text.IsEmpty())
-            //{
-            //    MessageBox.Show("릴레이 할 데이터가 없습니다");
-            //    return;
-            //}
-            
-            //var bodyData = Encoding.UTF8.GetBytes(textBoxRelay.Text);
-            //PostSendPacket(PACKET_ID.PACKET_ID_ROOM_RELAY_REQ, bodyData);
-            //DevLog.Write($"방 릴레이 요청");
+            var requestPkt = new ReadyRequestPacket();
 
+            if (isReady == false)
+            {
+                requestPkt.isReady = true;
+                PostSendPacket(PACKET_ID.OMOK_READY_REQ, requestPkt.ToBytes());
+                DevLog.Write($"READY 요청");
+            }
+            else
+            {
+                requestPkt.isReady = false;
+                PostSendPacket(PACKET_ID.OMOK_READY_REQ, requestPkt.ToBytes());
+                DevLog.Write($"READY 해제 요청");
+            }
         }
-
     }
 }

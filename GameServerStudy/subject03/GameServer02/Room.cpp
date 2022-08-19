@@ -81,7 +81,7 @@ void Room::OmokPlaceStone(User* user, int32_t x, int32_t y)
 	winner = this->m_pGame->AnalyzeBoard();
 	if (winner != 0)
 	{
-		this->BroadCastResult(winner);
+		//this->BroadCastResult(winner);
 		this->m_pGame->ClearBoard();
 	}
 	PktGameResultNtf pktNtf;
@@ -131,4 +131,9 @@ void Room::BroadCastResult(User* winner)
 	{
 		this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtf);
 	}
+}
+
+void Room::OmokEnterUser(User* user)
+{
+	this->m_pGame->EnterGame(user);
 }
