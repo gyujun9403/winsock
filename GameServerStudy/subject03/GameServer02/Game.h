@@ -41,7 +41,7 @@ private:
 	bool turn = false;
 	GAMESTATUS gameStatus;
 	Network* network;
-	void SendReadyRes(int sessionIndex, ERROR_CODE code);
+	void SendReadyRes(int sessionIndex, bool isReady, ERROR_CODE code);
 	void SendReadyNtf(int sessionIndex, bool isReady);
 	void SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color);
 	void SendPlaceStoneRes(int sessionIndex, ERROR_CODE code);

@@ -40,10 +40,11 @@ void Game::ClearBoard()
 	cntStone = 0;
 }
 
-void Game::SendReadyRes(int sessionIndex, ERROR_CODE code)
+void Game::SendReadyRes(int sessionIndex, bool isReady,  ERROR_CODE code)
 {
 	PktReadyRes pktRes;
 
+	pktRes.isReady = isReady;
 	pktRes.SetError(code);
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_READY_RES, sizeof(PktReadyRes), (char*)&pktRes);
 }
@@ -77,14 +78,14 @@ void Game::ReadyGame(User* user, bool isReady)
 		if (user == p1)
 		{
 			this->p1Ready = isReady;
-			this->SendReadyRes(user->GetSessionIndex(), code);
+			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
 			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
 			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
 		else if (user == p2)
 		{
-			this->p1Ready = isReady;
-			this->SendReadyRes(user->GetSessionIndex(), code);
+			this->p2Ready = isReady;
+			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
 			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
 			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
