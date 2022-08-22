@@ -212,10 +212,18 @@ namespace csharp_test_client
 
         void PacketProcess_GameResultNotify(byte[] BodyData)
         {
+            string msg;
             GameResultNtfPacket notifyPkt = new GameResultNtfPacket();
 
             notifyPkt.FromBytes(BodyData);
-            var msg = "winner is " + notifyPkt.UserID + "!!!"; 
+            if (notifyPkt.isWin == 1)
+            {
+                msg = "YOU WIN!!!"; 
+            }
+            else
+            {
+                msg = "you are loser ^^&";
+            }
             DevLog.Write(msg, LOG_LEVEL.ERROR);
             DrawBoard(); //이렇게 막 가지고 와도 되나?
         }

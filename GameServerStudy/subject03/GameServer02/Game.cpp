@@ -43,7 +43,8 @@ void Game::ClearBoard()
 void Game::SendReadyRes(int sessionIndex, bool isReady,  ERROR_CODE code)
 {
 	PktReadyRes pktRes;
-
+	
+	pktRes.SetError(ERROR_CODE::NONE);
 	pktRes.isReady = isReady;
 	pktRes.SetError(code);
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_READY_RES, sizeof(PktReadyRes), (char*)&pktRes);
@@ -79,15 +80,15 @@ void Game::ReadyGame(User* user, bool isReady)
 		{
 			this->p1Ready = isReady;
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
-			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
-			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
+			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
+			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
 		else if (user == p2)
 		{
 			this->p2Ready = isReady;
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
-			this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
-			this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
+			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
+			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
 	}
 }
@@ -151,7 +152,7 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 	SendPlaceStoneRes(user->GetSessionIndex(), code);
 }
 
-int16_t Game::AnalyzeBoard()
+User* Game::AnalyzeBoard()
 {
 	// 승리 조건 만족시 return true;
 	if (cntStone > 10)
@@ -160,17 +161,17 @@ int16_t Game::AnalyzeBoard()
 		this->gameStatus = GAMESTATUS::SHIFTING;
 		if (turn == true)
 		{
-			return 1;
+			return p1;
 
 		}
 		else
 		{
-			return 2;
+			return p2;
 		}
 		// 비길시 return -1
 		ClearBoard();
 	}
-	return 0;
+	return nullptr;
 }
 
 void Game::MakeWin(User* user)

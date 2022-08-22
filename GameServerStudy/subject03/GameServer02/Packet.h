@@ -135,7 +135,7 @@ struct PktGameResetNtf
 
 struct PktGameResultNtf
 {
-	int16_t idLen;
-	char UserID[MAX_USER_ID_SIZE];
+	int16_t isWin;
 };
+
 #pragma pack(pop)

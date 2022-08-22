@@ -49,7 +49,7 @@ namespace csharp_test_client
         OMOK_READY_RES = 85,
         OMOK_READY_NTF = 86,
         //PACKET_ID_ERROR_NTF = 703,
-
+        OMOK_CLEAR_BOARD_NTF = 99,
         //승리 패배
         OMOK_RESULT_NTF = 100,
 

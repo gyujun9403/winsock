@@ -288,11 +288,13 @@ namespace csharp_test_client
 
     public class ReadyResponsePacket
     {
+        public Int16 Result;
         public bool isReady;
 
         public bool FromBytes(byte[] bodyData)
         {
-            isReady = BitConverter.ToBoolean(bodyData, 0);
+            Result = BitConverter.ToInt16(bodyData, 0);
+            isReady = BitConverter.ToBoolean(bodyData, 2);
             return true;
         }
     }
@@ -365,15 +367,11 @@ namespace csharp_test_client
 
     public class GameResultNtfPacket
     {
-        Int16 idLen;
-        public string UserID;
+        public Int16 isWin;
 
         public bool FromBytes(byte[] bodyData)
         {
-            var readPos = 0;
-            idLen = BitConverter.ToInt16(bodyData, readPos);
-            readPos += sizeof(Int16);
-            UserID = BitConverter.ToString(bodyData, readPos, idLen);
+            isWin = BitConverter.ToInt16(bodyData, 0);
             return true;
         }
     }
