@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ITp8n1POn/1A8mMscKssr/1XdUFW2NMnSXwVYhS12HyE4s1Cn0CiGoRk8dyr6DNMMcx0j0/45m2Yx/lyqr2czA==",
+  "dgSpecHash": "LfF6mVff1W698MwHqT43NQZ0t5vC2VvKi5m08pQ5J4D/PFM56E1aC3vyJ0m4/EaNszcKQjlEHP7YYrxWu3957Q==",
   "success": true,
-  "projectFilePath": "C:\\Users\\gujun\\Documents\\GitHub\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
+  "projectFilePath": "C:\\Users\\gujun\\git\\winsock\\GameServerStudy\\omok_client\\OmokTestClient_01\\csharp_test_client.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\gujun\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\5.0.0\\microsoft.bcl.asyncinterfaces.5.0.0.nupkg.sha512",
     "C:\\Users\\gujun\\.nuget\\packages\\microsoft.csharp\\4.7.0\\microsoft.csharp.4.7.0.nupkg.sha512",

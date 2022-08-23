@@ -131,7 +131,15 @@ struct PktReadyNtf
 
 struct PktTurnNtf
 {
+	//int64_t uniqueId;
+	//char idlen;
+	//char UserID[MAX_USER_ID_SIZE];
 	bool yourTurn;
+};
+
+struct PktGameStartNtf
+{
+
 };
 
 struct PktGameResetNtf

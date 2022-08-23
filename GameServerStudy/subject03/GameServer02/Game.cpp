@@ -1,4 +1,5 @@
 #include <string.h>
+#include <time.h>
 #include "Game.h"
 #include "User.h"
 #include "Packet.h"
@@ -59,6 +60,14 @@ void Game::SendReadyNtf(int sessionIndex, bool isReady)
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_READY_NTF, sizeof(PktReadyNtf), (char*)&pktNtf);
 }
 
+void Game::SendGameStartNtf()
+{
+	PktGameStartNtf pktNtf;
+
+	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_START_NTF, sizeof(PktGameStartNtf), (char*)&pktNtf);
+	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_START_NTF, sizeof(PktGameStartNtf), (char*)&pktNtf);
+}
+
 void Game::ReadyGame(User* user, bool isReady)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
@@ -89,10 +98,35 @@ void Game::ReadyGame(User* user, bool isReady)
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
 			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
 			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
-			gameStatus = GAMESTATUS::RUNNING;
 
 		}
+		if (p1Ready == true && p2Ready == true)
+		{
+			gameStatus = GAMESTATUS::RUNNING;
+			SendGameStartNtf();
+			SetWhoIsFirst();
+			if (whoIsFirst == true)
+			{
+				SendTurnNtf(p1);
+				p1StoneColor = false;
+				p2StoneColor = true;
+				turn = true;
+			}
+			else
+			{
+				SendTurnNtf(p2);
+				p1StoneColor = true;
+				p2StoneColor = false;
+				turn = false;
+			}
+		}
 	}
+}
+
+void Game::SetWhoIsFirst()
+{
+	srand(time(NULL));
+	(rand() % 2 == 0) ? whoIsFirst = true : whoIsFirst = false;
 }
 
 void Game::SendPlaceStoneRes(int sessionIndex, ERROR_CODE code)
@@ -112,18 +146,40 @@ void Game::SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color)
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
 }
 
-void Game::SendTurnNtf(int sessionIndex, int32_t x, int32_t y, bool color)
+void Game::SendTurnNtf(User* turnedUser)
 {
-	PktTurnNtf pktNtf;
+	PktTurnNtf pktNtfForP1;
+	PktTurnNtf pktNtfForP2;
 	
-	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
+	/*pktNtf.uniqueId = turnedUser->GetSessionIndex();
+	pktNtf.idlen = turnedUser->GetId().size();
+	memcpy(pktNtf.UserID, turnedUser->GetId().c_str(), pktNtf.idlen);
+	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtf);
+	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtf);*/
+	if (turnedUser == p1)
+	{
+		pktNtfForP1.yourTurn = true;
+		pktNtfForP2.yourTurn = false;
+	}
+	else
+	{
+		pktNtfForP1.yourTurn = false;
+		pktNtfForP2.yourTurn = true;
+	}
+	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtfForP1);
+	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtfForP2);
 }
 
+// Èæµ¹ÀÌ ¸ÕÀúµÒ-> false»óÅÂÀÏ¶§ 
 void Game::PlaceStone(User* user, int32_t x, int32_t y)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
 
-	if (this->p1 == nullptr || this->p2 == nullptr)
+	if (gameStatus != GAMESTATUS::RUNNING)
+	{
+		return;
+	}
+	else if (this->p1 == nullptr || this->p2 == nullptr)
 	{
 		code = ERROR_CODE::OMOK_GAME_NOT_STARTED;
 	}
@@ -138,6 +194,7 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 			this->board[x][y] = 1;
 			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, true);
 			SendPlaceStoneNtf(p2->GetSessionIndex(), x, y, true);
+			SendTurnNtf(p2);
 			turn = false;
 
 		}
@@ -146,6 +203,7 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 			this->board[x][y] = 2;
 			SendPlaceStoneNtf(p1->GetSessionIndex(), x, y, false);
 			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, false);
+			SendTurnNtf(p1);
 			turn = true;
 		}
 		cntStone++;
@@ -168,9 +226,11 @@ User* Game::AnalyzeBoard()
 	if (cntStone > 10)
 	{
 
-		this->gameStatus = GAMESTATUS::SHIFTING;
+		//this->gameStatus = GAMESTATUS::SHIFTING;
+		gameStatus = GAMESTATUS::WAITING;
 		if (turn == true)
 		{
+			
 			return p1;
 
 		}

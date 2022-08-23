@@ -25,7 +25,8 @@ namespace csharp_test_client
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_NTF, PacketProcess_PlaceStoneNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_RESULT_NTF, PacketProcess_GameResultNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_READY_RES, PacketProcess_ReadyResponse);
-            
+            PacketFuncDic.Add(PACKET_ID.OMOK_GAME_START_NTF, PacketProcess_GameStartNotify);
+            PacketFuncDic.Add(PACKET_ID.OMOK_TURN_NTF, PacketProcess_GameTurnNotify);
             //PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_RELAY_NTF, PacketProcess_RoomRelayNotify);
         }
 
@@ -224,6 +225,10 @@ namespace csharp_test_client
             {
                 msg = "you are loser ^^&";
             }
+            setIsReady(false);
+            btnReady.Enabled = true;
+            btnReady.Text = "READY";
+            btnReady.BackColor = System.Drawing.Color.White;
             DevLog.Write(msg, LOG_LEVEL.ERROR);
             DrawBoard(); //이렇게 막 가지고 와도 되나?
         }
@@ -244,9 +249,41 @@ namespace csharp_test_client
             }
         }
 
-        void PacketProcess_ReadyNotify(byte[] BodyData)
+        // OMOK_GAME_START_NTF = 87,
+        //OMOK_GAME_END_NTF = 88,
+        ///OMOK_TURN_NTF = 89,
+        void PacketProcess_GameStartNotify(byte[] BodyData)
         {
-
+            btnReady.Enabled = false;
+            btnReady.Text = "In Play";
         }
+
+        void PacketProcess_GameTurnNotify(byte[] BodyData)
+        {
+            GameTurnNtfPacket ntfPkt = new GameTurnNtfPacket();
+
+            ntfPkt.FromBytes(BodyData);
+            //ShowWhosTurn(ntfPkt.UserUniqueId, ntfPkt.UserID);'
+            if (ntfPkt.isMyturn == true)
+            {
+                btnReady.BackColor = System.Drawing.Color.Yellow;
+                btnReady.Text = "Your Turn";
+            }
+            else
+            {
+                btnReady.BackColor = System.Drawing.Color.White;
+                btnReady.Text = "In Play";
+            }
+        }
+
+        //void ShowWhosTurn(Int64 userUniqueId, string userID)
+        //{
+        //    //var msg = $"{userUniqueId}: {userID}";
+        //    ////listBoxRoomUserList.Items.Remove(msg);
+        //    //var idx = listBoxRoomUserList.Items.IndexOf(msg);
+        //    //listBoxRoomUserList.Items[idx].
+        //    if ()
+
+        //}
     }
 }

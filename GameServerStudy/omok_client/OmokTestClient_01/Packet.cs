@@ -375,4 +375,23 @@ namespace csharp_test_client
             return true;
         }
     }
+
+    //OMOK_GAME_START_NTF = 87,
+    //OMOK_GAME_END_NTF = 88,
+    //OMOK_TURN_NTF = 89,
+
+    public class GameStartNtfPacket
+    {
+    }
+
+    public class GameTurnNtfPacket
+    {
+        public bool isMyturn;
+
+        public bool FromBytes(byte[] bodyData)
+        {
+            isMyturn = BitConverter.ToBoolean(bodyData, 0);
+            return true;
+        }
+    }
 }

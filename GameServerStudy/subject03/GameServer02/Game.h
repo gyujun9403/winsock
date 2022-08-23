@@ -35,14 +35,20 @@ private:
 	User* p1;
 	User* p2;
 	bool p1Ready = false;
+	bool p1StoneColor = false;
 	bool p2Ready = false;
+	bool p2StoneColor = false;
 	int16_t board[19][19];
 	int16_t cntStone = 0;
 	bool turn = false;
+	bool whoIsFirst = false; // true면 p1이 black, false면 p2가 black
 	GAMESTATUS gameStatus;
 	Network* network;
 	void SendReadyRes(int sessionIndex, bool isReady, ERROR_CODE code);
 	void SendReadyNtf(int sessionIndex, bool isReady);
+	void SendTurnNtf(User* turnedUser);
+	void SendGameStartNtf();
+	void SetWhoIsFirst();
 	void SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color);
 	void SendPlaceStoneRes(int sessionIndex, ERROR_CODE code);
 };

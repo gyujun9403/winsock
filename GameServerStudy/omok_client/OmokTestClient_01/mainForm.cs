@@ -42,6 +42,11 @@ namespace csharp_test_client
             isReady = ready;
         }
 
+        public bool getIsready()
+        {
+            return isReady;
+        }
+
         public mainForm()
         {
             InitializeComponent();
