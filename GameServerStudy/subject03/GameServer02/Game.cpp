@@ -32,8 +32,8 @@ void Game::ClearBoard()
 
 	memset(this->board, 0, sizeof(this->board));
 	this->gameStatus = GAMESTATUS::WAITING;
-	this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_CLEAR_BOARD_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
-	this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_CLEAR_BOARD_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
+	this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
+	this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
 	this->p1 = nullptr;
 	this->p2 = nullptr;
 	this->turn = true;
@@ -89,6 +89,8 @@ void Game::ReadyGame(User* user, bool isReady)
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
 			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
 			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
+			gameStatus = GAMESTATUS::RUNNING;
+
 		}
 	}
 }
@@ -107,6 +109,13 @@ void Game::SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color)
 	pktNtf.color = color;
 	pktNtf.x = x;
 	pktNtf.y = y;
+	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
+}
+
+void Game::SendTurnNtf(int sessionIndex, int32_t x, int32_t y, bool color)
+{
+	PktTurnNtf pktNtf;
+	
 	this->network->SendData(sessionIndex, (short)PACKET_ID::OMOK_PLACE_STONE_NTF, sizeof(PktPlaceStoneNtf), (char*)&pktNtf);
 }
 
@@ -130,6 +139,7 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, true);
 			SendPlaceStoneNtf(p2->GetSessionIndex(), x, y, true);
 			turn = false;
+
 		}
 		else if (user == this->p2 && turn == false)
 		{

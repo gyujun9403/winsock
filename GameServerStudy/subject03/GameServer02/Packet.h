@@ -129,6 +129,11 @@ struct PktReadyNtf
 	bool isReady;
 };
 
+struct PktTurnNtf
+{
+	bool yourTurn;
+};
+
 struct PktGameResetNtf
 {
 };
