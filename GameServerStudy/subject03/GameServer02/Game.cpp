@@ -29,12 +29,25 @@ void Game::EnterGame(User* user)
 
 void Game::LeaveGame(User* user)
 {
+	if (gameStatus == GAMESTATUS::RUNNING)
+	{
+		if (user == p1)
+		{
+			MakeWin(p2);
+		}
+		else if (user == p2)
+		{
+			MakeWin(p1);
+		}
+	}
 	if (p1 == user)
 	{
+		ClearBoard();
 		p1 = nullptr;
 	}
 	else if (p2 == user)
 	{
+		ClearBoard();
 		p2 = nullptr;
 	}
 	else
@@ -49,14 +62,23 @@ void Game::ClearBoard()
 
 	memset(this->board, 0, sizeof(this->board));
 	this->gameStatus = GAMESTATUS::WAITING;
-	this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
-	this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
+	//this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
+	//this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
 	//this->p1 = nullptr;
 	//this->p2 = nullptr;
-	p1Ready = false;
-	p2Ready = false;
+	if (p1Ready == true)
+	{
+		p1Ready = false;
+		this->SendReadyNtf(p1->GetSessionIndex(), false);
+	}
+	if (p2Ready == true)
+	{
+		p2Ready = false;
+		this->SendReadyNtf(p2->GetSessionIndex(), false);
+	}
 	this->turn = true;
 	cntStone = 0;
+	gameStatus = GAMESTATUS::WAITING;
 }
 
 void Game::SendReadyRes(int sessionIndex, bool isReady,  ERROR_CODE code)
@@ -210,8 +232,8 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 		if (user == this->p1 && turn == true)
 		{
 			this->board[x][y] = 1;
-			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, true);
-			SendPlaceStoneNtf(p2->GetSessionIndex(), x, y, true);
+			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, p1StoneColor);
+			SendPlaceStoneNtf(p2->GetSessionIndex(), x, y, p1StoneColor);
 			SendTurnNtf(p2);
 			turn = false;
 
@@ -219,8 +241,8 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 		else if (user == this->p2 && turn == false)
 		{
 			this->board[x][y] = 2;
-			SendPlaceStoneNtf(p1->GetSessionIndex(), x, y, false);
-			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, false);
+			SendPlaceStoneNtf(p1->GetSessionIndex(), x, y, p2StoneColor);
+			SendPlaceStoneNtf(user->GetSessionIndex(), x, y, p2StoneColor);
 			SendTurnNtf(p1);
 			turn = true;
 		}
@@ -238,33 +260,48 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 	SendPlaceStoneRes(user->GetSessionIndex(), code);
 }
 
-User* Game::AnalyzeBoard()
+void Game::AnalyzeBoard()
 {
 	// 승리 조건 만족시 return true;
 	if (cntStone > 10)
 	{
 
 		//this->gameStatus = GAMESTATUS::SHIFTING;
-		gameStatus = GAMESTATUS::WAITING;
+		//gameStatus = GAMESTATUS::WAITING;
 		if (turn == true)
 		{
-			
-			return p1;
-
+			ClearBoard();
 		}
 		else
 		{
-			return p2;
+			ClearBoard();
 		}
 		// 비길시 return -1
-		ClearBoard();
-		cntStone = 0;
+		MakeWin(p2);
 	}
-	return nullptr;
 }
 
 void Game::MakeWin(User* user)
 {
+	PktGameResultNtf pktNtfP1;
+	PktGameResultNtf pktNtfP2;
+
+	if (p1 == user)
+	{
+		pktNtfP1.isWin = true;
+		pktNtfP2.isWin = false;
+	}
+	else if (p2 == user)
+	{
+		pktNtfP1.isWin = false;
+		pktNtfP2.isWin = true;
+	}
+	else
+	{
+		return;
+	}
+	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtfP1);
+	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtfP2);
 }
 
 //bool Game::IsGaming()

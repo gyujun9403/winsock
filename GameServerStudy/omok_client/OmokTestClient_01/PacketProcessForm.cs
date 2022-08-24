@@ -25,6 +25,7 @@ namespace csharp_test_client
             PacketFuncDic.Add(PACKET_ID.OMOK_PLACE_STONE_NTF, PacketProcess_PlaceStoneNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_RESULT_NTF, PacketProcess_GameResultNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_READY_RES, PacketProcess_ReadyResponse);
+            PacketFuncDic.Add(PACKET_ID.OMOK_READY_NTF, PacketProcess_ReadyNotifiy);
             PacketFuncDic.Add(PACKET_ID.OMOK_GAME_START_NTF, PacketProcess_GameStartNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_TURN_NTF, PacketProcess_GameTurnNotify);
             //PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_RELAY_NTF, PacketProcess_RoomRelayNotify);
@@ -230,6 +231,7 @@ namespace csharp_test_client
             btnReady.Text = "READY";
             btnReady.BackColor = System.Drawing.Color.White;
             DevLog.Write(msg, LOG_LEVEL.ERROR);
+            BoardClear();
             DrawBoard(); //이렇게 막 가지고 와도 되나?
         }
 
@@ -240,6 +242,22 @@ namespace csharp_test_client
             resPkt.FromBytes(BodyData);
             setIsReady(resPkt.isReady);
             if (resPkt.isReady == true)
+            {
+                btnReady.Text = "WAITING...";
+            }
+            else
+            {
+                btnReady.Text = "READY";
+            }
+        }
+
+        void PacketProcess_ReadyNotifiy(byte[] BodyData)
+        {
+            ReadyNotificationPacket ntfPkt = new ReadyNotificationPacket();
+
+            ntfPkt.FromBytes(BodyData);
+            setIsReady(ntfPkt.isReady);
+            if (ntfPkt.isReady == true)
             {
                 btnReady.Text = "WAITING...";
             }

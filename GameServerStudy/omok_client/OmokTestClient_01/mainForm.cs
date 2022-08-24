@@ -338,6 +338,10 @@ namespace csharp_test_client
             }
         }
 
+        public void BoardClear()
+        {
+            board.ClearAll();
+        }
 
         // 로그인 요청
         private void button2_Click(object sender, EventArgs e)

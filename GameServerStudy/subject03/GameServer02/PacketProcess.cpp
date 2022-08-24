@@ -231,7 +231,12 @@ ERROR_CODE PacketProcess::OmokPlaceStone(PacketInfo packetInfo)
 	{
 		return ERROR_CODE::NONE;
 	}
-	this->refRoomMgr_->GetRoomUserEntered(user)->OmokPlaceStone(user, PktReq->x, PktReq->y);
+	Room* room = this->refRoomMgr_->GetRoomUserEntered(user);
+	if (room == nullptr)
+	{
+		return ERROR_CODE::NONE;
+	}
+	room->OmokPlaceStone(user, PktReq->x, PktReq->y);
 	return ERROR_CODE::NONE;
 }
 
@@ -245,6 +250,10 @@ ERROR_CODE PacketProcess::OmokReadyRequest(PacketInfo packetInfo)
 	{
 		return ERROR_CODE::NONE;
 	}
-	this->refRoomMgr_->GetRoomUserEntered(user)->OmokReadyUser(user, PktReq->isReady);
+	Room* room = this->refRoomMgr_->GetRoomUserEntered(user);
+	if (room != nullptr)
+	{
+		room->OmokReadyUser(user, PktReq->isReady);
+	}
 	return ERROR_CODE();
 }

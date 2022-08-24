@@ -43,13 +43,13 @@ public:
 		return (std::find(this->m_UserList.begin(), this->m_UserList.end(), user) != this->m_UserList.end());
 	}
 	void Enter(User* user) { this->m_UserList.push_back(user); }
-	void Leave(User* user) { this->m_UserList.erase(std::find(this->m_UserList.begin(), this->m_UserList.end(), user)); }
+	void Leave(User* user);// { this->m_UserList.erase(std::find(this->m_UserList.begin(), this->m_UserList.end(), user)); }
 	void BroadCastOtherJoin(User* other);
 	void BroadCastOtherLeave(User* other);
 	void BroadCastOtherChat(User* other, std::string msg);
 	void GetListOtherUser(User* other);
 	//
-	void BroadCastResult(User* winner);
+	//void BroadCastResult(User* winner);
 	void OmokEnterUser(User* user);
 	void OmokReadyUser(User* user, bool isReady);
 	void OmokPlaceStone(User* user, int32_t x, int32_t y);

@@ -39,6 +39,12 @@ void Room::Clear()
 	m_UserList.clear();
 }
 
+void Room::Leave(User* user)
+{
+	m_pGame->LeaveGame(user);
+	this->m_UserList.erase(std::find(this->m_UserList.begin(), this->m_UserList.end(), user));
+}
+
 void Room::BroadCastOtherJoin(User* other)
 {
 	PktRoomEnterUserInfoNtf pktRes;
@@ -78,13 +84,7 @@ void Room::OmokPlaceStone(User* user, int32_t x, int32_t y)
 {
 	User* winner;
 	this->m_pGame->PlaceStone(user, x, y);
-	winner = this->m_pGame->AnalyzeBoard();
-	if (winner != 0)
-	{
-		this->BroadCastResult(winner);
-		this->m_pGame->ClearBoard();
-	}
-	PktGameResultNtf pktNtf;
+	this->m_pGame->AnalyzeBoard();
 }
 
 void Room::OmokLeaveOther(User* user)
@@ -100,10 +100,7 @@ void Room::BroadCastOtherLeave(User* other)
 	memcpy(pktRes.UserID, other->GetId().c_str(), pktRes.idlen);
 	for (User* element : this->m_UserList)
 	{
-		//if (element != other)
-		//{
-			this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_LEAVE_USER_NTF, sizeof(PktRoomLeaveUserInfoNtf), (char*)&pktRes);
-		//}
+		this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_LEAVE_USER_NTF, sizeof(PktRoomLeaveUserInfoNtf), (char*)&pktRes);
 	}
 }
 
@@ -117,24 +114,6 @@ void Room::BroadCastOtherChat(User* other, std::string msg)
 	for (User* element : this->m_UserList)
 	{
 		this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::ROOM_CHAT_NTF, sizeof(PktRoomChatNtf), (char*)&pktRes);
-	}
-}
-
-void Room::BroadCastResult(User* winner)
-{
-	PktGameResultNtf pktNtf;
-	  
-	for (User* element : this->m_UserList)
-	{
-		if (winner == element)
-		{
-			pktNtf.isWin = true;
-		}
-		else
-		{
-			pktNtf.isWin = false;
-		}
-		this->m_pRefNetwork->SendData(element->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtf);
 	}
 }
 
