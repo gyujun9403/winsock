@@ -23,6 +23,7 @@ class Game
 public:
 	void setNetwork(Network* net);
 	void EnterGame(User* user);
+	void LeaveGame(User* user);
 	void ClearBoard(); // 오목판 비우기
 	void ReadyGame(User* user, bool isReady); // 게임 시작. -> 둘 다 레디,
 	void PlaceStone(User* user, int32_t x, int32_t y);

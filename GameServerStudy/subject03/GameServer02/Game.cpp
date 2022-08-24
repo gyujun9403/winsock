@@ -27,6 +27,22 @@ void Game::EnterGame(User* user)
 	}
 }
 
+void Game::LeaveGame(User* user)
+{
+	if (p1 == user)
+	{
+		p1 = nullptr;
+	}
+	else if (p2 == user)
+	{
+		p2 = nullptr;
+	}
+	else
+	{
+		;
+	}
+}
+
 void Game::ClearBoard()
 {
 	PktGameResetNtf pktNtf;
@@ -35,8 +51,10 @@ void Game::ClearBoard()
 	this->gameStatus = GAMESTATUS::WAITING;
 	this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
 	this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
-	this->p1 = nullptr;
-	this->p2 = nullptr;
+	//this->p1 = nullptr;
+	//this->p2 = nullptr;
+	p1Ready = false;
+	p2Ready = false;
 	this->turn = true;
 	cntStone = 0;
 }
@@ -240,6 +258,7 @@ User* Game::AnalyzeBoard()
 		}
 		// ºñ±æ½Ã return -1
 		ClearBoard();
+		cntStone = 0;
 	}
 	return nullptr;
 }
