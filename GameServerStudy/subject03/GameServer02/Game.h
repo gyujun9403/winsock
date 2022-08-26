@@ -26,8 +26,9 @@ public:
 	void LeaveGame(User* user);
 	void ClearBoard(); // 오목판 비우기
 	void ReadyGame(User* user, bool isReady); // 게임 시작. -> 둘 다 레디,
-	void PlaceStone(User* user, int32_t x, int32_t y);
-	void AnalyzeBoard();
+	bool PlaceStone(User* user, int32_t x, int32_t y);
+	void AnalyzeBoard(User* user, int16_t x, int16_t y);
+	//void AnalyzeBoard();
 	void MakeWin(User* user); // 누가 나가면, 그사람 승리하게 만듦.
 	GAMESTATUS getGameStatus();
 	//bool IsGaming(); // 게임중인지 아닌지 표시.
@@ -52,5 +53,6 @@ private:
 	void SetWhoIsFirst();
 	void SendPlaceStoneNtf(int sessionIndex, int32_t x, int32_t y, bool color);
 	void SendPlaceStoneRes(int sessionIndex, ERROR_CODE code);
+	int16_t AxisCheck(int16_t x, int16_t y, int16_t xOffset, int16_t yOffset, int16_t color);
 };
 

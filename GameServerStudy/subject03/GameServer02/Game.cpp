@@ -62,10 +62,6 @@ void Game::ClearBoard()
 
 	memset(this->board, 0, sizeof(this->board));
 	this->gameStatus = GAMESTATUS::WAITING;
-	//this->network->SendData(this->p1->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
-	//this->network->SendData(this->p2->GetSessionIndex(), (short)PACKET_ID::OMOK_GAME_END_NTF, sizeof(PktGameResetNtf), (char*)&pktNtf);
-	//this->p1 = nullptr;
-	//this->p2 = nullptr;
 	if (p1Ready == true)
 	{
 		p1Ready = false;
@@ -111,14 +107,10 @@ void Game::SendGameStartNtf()
 void Game::ReadyGame(User* user, bool isReady)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
-	// 유저 인덱스가 맞는지(방에 포함되어 있는지) -> 이건 밖에서 확인하기. 안해도 됨.
-	// 유저가 레디 가능한 상태인지 -> 게임중/대기중 불가. 아이콘을 disable로 만드는건?
 	if (this->gameStatus != GAMESTATUS::WAITING)
 	{
-		// waiting 상태가 아닌데 ready를 함 -> 문제가 있음.
 		code = ERROR_CODE::OMOK_CANT_READY;
 	}
-	// p1 p2모두 있어야 ready가능
 	else if (p1 == nullptr || p2 == nullptr)
 	{
 		;
@@ -129,16 +121,11 @@ void Game::ReadyGame(User* user, bool isReady)
 		{
 			this->p1Ready = isReady;
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
-			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
-			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
 		}
 		else if (user == p2)
 		{
 			this->p2Ready = isReady;
 			this->SendReadyRes(user->GetSessionIndex(), isReady, code);
-			//this->SendReadyNtf(this->p1->GetSessionIndex(), isReady);
-			//this->SendReadyNtf(this->p2->GetSessionIndex(), isReady);
-
 		}
 		if (p1Ready == true && p2Ready == true)
 		{
@@ -191,11 +178,6 @@ void Game::SendTurnNtf(User* turnedUser)
 	PktTurnNtf pktNtfForP1;
 	PktTurnNtf pktNtfForP2;
 	
-	/*pktNtf.uniqueId = turnedUser->GetSessionIndex();
-	pktNtf.idlen = turnedUser->GetId().size();
-	memcpy(pktNtf.UserID, turnedUser->GetId().c_str(), pktNtf.idlen);
-	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtf);
-	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtf);*/
 	if (turnedUser == p1)
 	{
 		pktNtfForP1.yourTurn = true;
@@ -211,21 +193,21 @@ void Game::SendTurnNtf(User* turnedUser)
 }
 
 // 흑돌이 먼저둠-> false상태일때 
-void Game::PlaceStone(User* user, int32_t x, int32_t y)
+bool Game::PlaceStone(User* user, int32_t x, int32_t y)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
 
 	if (gameStatus != GAMESTATUS::RUNNING)
 	{
-		return;
+		return false;
 	}
 	else if (this->p1 == nullptr || this->p2 == nullptr)
 	{
-		code = ERROR_CODE::OMOK_GAME_NOT_STARTED;
+		return false;
 	}
 	else if (x < 0 || x > 19 || y < 0 || y > 19)
 	{
-		code = ERROR_CODE::OMOK_NOT_VALIED_PLACE;
+		return false;
 	}
 	else if (this->board[x][y] == 0)
 	{
@@ -247,37 +229,70 @@ void Game::PlaceStone(User* user, int32_t x, int32_t y)
 			turn = true;
 		}
 		cntStone++;
-		//else
-		//{
-		//	//TODO: this->network->SendData();
-		//	return ERROR_CODE::USER_MGR_NOT_CONFIRM_USER;
-		//} ->  짜치  room에서 확인해서 보내줄거임.
 	}
 	else
 	{
-		code = ERROR_CODE::OMOK_PLACE_OCCUFIED;
+		return false;
 	}
+	//TODO: not your turn, valid place -> 
 	SendPlaceStoneRes(user->GetSessionIndex(), code);
+	return true;
 }
 
-void Game::AnalyzeBoard()
+int16_t Game::AxisCheck(int16_t x, int16_t y, int16_t xUnitOffset, int16_t yUnitOffset, int16_t color)
 {
-	// 승리 조건 만족시 return true;
-	if (cntStone > 10)
-	{
+	int16_t newX = 0;
+	int16_t newY = 0;
+	int16_t reVal = 0;
 
-		//this->gameStatus = GAMESTATUS::SHIFTING;
-		//gameStatus = GAMESTATUS::WAITING;
-		if (turn == true)
+	for (int16_t i = 0; i < 5; i++)
+	{
+		newX = x + i * xUnitOffset;
+		newY = y + i * yUnitOffset;
+		if (newX < 0 || newX > 19 || newY < 0 || newY > 19 ||
+			board[newX][newY] != color)
 		{
-			ClearBoard();
+			break;
 		}
 		else
 		{
-			ClearBoard();
+			++reVal;
 		}
-		// 비길시 return -1
-		MakeWin(p2);
+	}
+	for (int16_t i = 1; i < 5; i++)
+	{
+		newX = x - i * xUnitOffset;
+		newY = y - i * yUnitOffset;
+		if (newX < 0 || newX > 19 || newY < 0 || newY > 19 ||
+			board[newX][newY] != color)
+		{
+			break;
+		}
+		else
+		{
+			++reVal;
+		}
+	}
+	return reVal;
+}
+
+void Game::AnalyzeBoard(User* user, int16_t x, int16_t y)
+{
+	int16_t color;
+
+	if (user == p1)
+	{
+		color = 1;
+	}
+	else
+	{
+		color = 2;
+	}
+	if (AxisCheck(x, y, 1, 0, color) >= 5 || AxisCheck(x, y, 0, 1, color) >= 5 ||
+		AxisCheck(x, y, 1, 1, color) >= 5 || AxisCheck(x, y, -1, 1, color) >= 5)
+	{
+		ClearBoard();
+		MakeWin(user);
 	}
 }
 
@@ -303,11 +318,6 @@ void Game::MakeWin(User* user)
 	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtfP1);
 	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_RESULT_NTF, sizeof(PktGameResultNtf), (char*)&pktNtfP2);
 }
-
-//bool Game::IsGaming()
-//{
-//	return this->isGaming;
-//}
 
 GAMESTATUS Game::getGameStatus()
 {

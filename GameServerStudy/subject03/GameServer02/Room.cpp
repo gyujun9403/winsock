@@ -83,8 +83,10 @@ void Room::OmokReadyUser(User* user, bool isReady)
 void Room::OmokPlaceStone(User* user, int32_t x, int32_t y)
 {
 	User* winner;
-	this->m_pGame->PlaceStone(user, x, y);
-	this->m_pGame->AnalyzeBoard();
+	if (this->m_pGame->PlaceStone(user, x, y))
+	{
+		this->m_pGame->AnalyzeBoard(user, x, y);
+	}
 }
 
 void Room::OmokLeaveOther(User* user)

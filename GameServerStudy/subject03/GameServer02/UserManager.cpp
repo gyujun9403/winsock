@@ -26,7 +26,8 @@ void UserManager::Init(const int maxUserCount)
 
 ERROR_CODE UserManager::AddUser(const int sessionIndex, const char* pszID)
 {
-	if (FindUser(pszID) != nullptr) {
+	if (FindUser(pszID) != nullptr)
+	{
 		return ERROR_CODE::USER_MGR_ID_DUPLICATION;
 	}
 	else

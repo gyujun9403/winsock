@@ -272,16 +272,14 @@ namespace csharp_test_client
         {
             if (btnConnect.Enabled == false)
             {
-                btnConnect.Enabled = true;
-                btnDisconnect.Enabled = false;
+                btnConnect.Invoke(new MethodInvoker(delegate { btnConnect.Enabled = true; }));
+                btnDisconnect.Invoke(new MethodInvoker(delegate { btnDisconnect.Enabled = false; }));
             }
-
             SendPacketQueue.Clear();
-
-            listBoxRoomChatMsg.Items.Clear();
-            listBoxRoomUserList.Items.Clear();
-
-            labelStatus.Text = "서버 접속이 끊어짐";
+            listBoxRoomChatMsg.Invoke(new MethodInvoker(delegate { listBoxRoomChatMsg.Items.Clear(); }));
+            listBoxRoomUserList.Invoke(new MethodInvoker(delegate { listBoxRoomUserList.Items.Clear(); }));
+            labelStatus.Invoke(new MethodInvoker(delegate { labelStatus.Text = "서버 접속이 끊어짐"; }));
+            //labelStatus.Text = "서버 접속이 끊어짐";
         }
 
         public void PostSendPacket(PACKET_ID packetID, byte[] bodyData)
@@ -347,10 +345,11 @@ namespace csharp_test_client
         private void button2_Click(object sender, EventArgs e)
         {
             var loginReq = new LoginReqPacket();
-            loginReq.SetValue(textBoxUserID.Text, textBoxUserPW.Text);
+            loginReq.SetValue(textBoxUserID.Text, "");
                     
-            PostSendPacket(PACKET_ID.LOGIN_REQ, loginReq.ToBytes());            
-            DevLog.Write($"로그인 요청:  {textBoxUserID.Text}, {textBoxUserPW.Text}");
+            PostSendPacket(PACKET_ID.LOGIN_REQ, loginReq.ToBytes());
+            //DevLog.Write($"로그인 요청:  {textBoxUserID.Text}, {textBoxUserPW.Text}");
+            DevLog.Write($"로그인 요청:  {textBoxUserID.Text}");
         }
 
         private void btn_RoomEnter_Click(object sender, EventArgs e)
@@ -508,6 +507,36 @@ namespace csharp_test_client
         }
 
         private void textBoxRelay_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void checkBoxLocalHostIP_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxRoomNumber_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Room_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxUserID_TextChanged(object sender, EventArgs e)
         {
 
         }

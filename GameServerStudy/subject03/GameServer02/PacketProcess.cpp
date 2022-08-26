@@ -75,9 +75,9 @@ ERROR_CODE PacketProcess::NtfSysCloseSession(PacketInfo packetInfo)
 	auto user = std::get<1>(this->refUserMgr_->GetUser(packetInfo.SessionIndex));
 	if (user)
 	{
+		this->LeaveRoom(packetInfo);
 		this->refUserMgr_->RemeveUser(packetInfo.SessionIndex);
 		// Homework
-		this->LeaveRoom(packetInfo);
 	}
 	else
 	{
