@@ -28,7 +28,7 @@ namespace csharp_test_client
             PacketFuncDic.Add(PACKET_ID.OMOK_READY_NTF, PacketProcess_ReadyNotifiy);
             PacketFuncDic.Add(PACKET_ID.OMOK_GAME_START_NTF, PacketProcess_GameStartNotify);
             PacketFuncDic.Add(PACKET_ID.OMOK_TURN_NTF, PacketProcess_GameTurnNotify);
-            //PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_RELAY_NTF, PacketProcess_RoomRelayNotify);
+            PacketFuncDic.Add(PACKET_ID.OMOK_DRAG_NTF, PacketProcess_GameDragNotify);
         }
 
         void PacketProcess(PacketData packet)
@@ -194,10 +194,6 @@ namespace csharp_test_client
             {
                 DevLog.Write(msg, LOG_LEVEL.ERROR);
             }
-            else
-            {
-                
-            }
         }
 
         void PacketProcess_PlaceStoneNotify(byte[] BodyData)
@@ -230,7 +226,8 @@ namespace csharp_test_client
             btnReady.Enabled = true;
             btnReady.Text = "READY";
             btnReady.BackColor = System.Drawing.Color.White;
-            DevLog.Write(msg, LOG_LEVEL.ERROR);
+            //DevLog.Write(msg, LOG_LEVEL.ERROR);
+            AddRoomChatMessageList(0, msg);
             BoardClear();
             DrawBoard(); //이렇게 막 가지고 와도 되나?
         }
@@ -281,7 +278,6 @@ namespace csharp_test_client
             GameTurnNtfPacket ntfPkt = new GameTurnNtfPacket();
 
             ntfPkt.FromBytes(BodyData);
-            //ShowWhosTurn(ntfPkt.UserUniqueId, ntfPkt.UserID);'
             if (ntfPkt.isMyturn == true)
             {
                 btnReady.BackColor = System.Drawing.Color.Yellow;
@@ -294,14 +290,13 @@ namespace csharp_test_client
             }
         }
 
-        //void ShowWhosTurn(Int64 userUniqueId, string userID)
-        //{
-        //    //var msg = $"{userUniqueId}: {userID}";
-        //    ////listBoxRoomUserList.Items.Remove(msg);
-        //    //var idx = listBoxRoomUserList.Items.IndexOf(msg);
-        //    //listBoxRoomUserList.Items[idx].
-        //    if ()
+        void PacketProcess_GameDragNotify(byte[] BodyData)
+        {
+            GameDragNtfPacket ntfPkt = new GameDragNtfPacket();
 
-        //}
+            ntfPkt.FromBytes(BodyData);
+            btnReady.Text = "Your Turn(" + ntfPkt.leftSecond.ToString() + ")...";
+            btnReady.BackColor = System.Drawing.Color.Red;
+        }
     }
 }

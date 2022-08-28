@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include "Define.h"
 #include "ServerNetErrorCode.h"
 #include "ILog.h"
@@ -26,5 +27,7 @@ namespace NServerNetLib
 		virtual int ClientSessionPoolSize() { return 0; }
 
 		virtual void ForcingClose(const int sessionIndex) {}
+	private:
+		std::mutex m;
 	};
 }

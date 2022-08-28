@@ -24,6 +24,7 @@ void Room::Init(const short index, const short maxUserCount)
 	m_Index = index;
 	m_MaxUserCount = maxUserCount;
 	m_pGame = new Game();
+	gameM = m_pGame->getMutex();
 }
 
 void Room::SetNetwork(TcpNet* pNetwork, ILog* pLogger)
@@ -122,4 +123,28 @@ void Room::BroadCastOtherChat(User* other, std::string msg)
 void Room::OmokEnterUser(User* user)
 {
 	this->m_pGame->EnterGame(user);
+}
+
+void Room::SendDragingMsg(int limitSec)
+{
+	if (gameM->try_lock())
+	{
+		PktGameDragNtf pktNtf;
+		time_t now = time(NULL);
+		std::pair<User*, time_t> p1AndTurnedTime = m_pGame->GetGameP1AndTime();
+		std::pair<User*, time_t> p2AndTurnedTime = m_pGame->GetGameP2AndTime();
+		if (now > p1AndTurnedTime.second + limitSec)
+		{
+			//TODO: 되는지 확인하고, 되면 3초 넘기면 자동으로 턴 넘어가게 하기.
+			pktNtf.leftSecond = static_cast<uint16_t>(now - p1AndTurnedTime.second + limitSec);
+			m_pRefNetwork->SendData(p1AndTurnedTime.first->GetSessionIndex(), (short)PACKET_ID::OMOK_DRAG_NTF, sizeof(PktGameDragNtf), (char*)&pktNtf);
+		}
+		else if (now > p2AndTurnedTime.second + limitSec)
+		{
+			pktNtf.leftSecond = static_cast<uint16_t>(now - p1AndTurnedTime.second + limitSec);
+			m_pRefNetwork->SendData(p2AndTurnedTime.first->GetSessionIndex(), (short)PACKET_ID::OMOK_DRAG_NTF, sizeof(PktGameDragNtf), (char*)&pktNtf);
+		}
+
+		gameM->unlock();
+	}
 }

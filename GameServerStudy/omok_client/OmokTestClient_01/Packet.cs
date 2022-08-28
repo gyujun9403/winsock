@@ -394,4 +394,15 @@ namespace csharp_test_client
             return true;
         }
     }
+
+    public class GameDragNtfPacket
+    {
+        public UInt16 leftSecond;
+
+        public bool FromBytes(byte[] bodyData)
+        {
+            leftSecond = BitConverter.ToUInt16(bodyData, 0);
+            return true;
+        }
+    }
 }

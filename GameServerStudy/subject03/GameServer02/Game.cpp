@@ -7,12 +7,15 @@
 
 void Game::setNetwork(Network* net)
 {
+	std::lock_guard<std::mutex> lock_guard(m);
 	this->network = net;
 	this->turn = true;
 }
 
 void Game::EnterGame(User* user)
 {
+	std::lock_guard<std::mutex> lock_guard(m);
+
 	if (this->p1 == nullptr)
 	{
 		this->p1 = user;
@@ -29,6 +32,8 @@ void Game::EnterGame(User* user)
 
 void Game::LeaveGame(User* user)
 {
+	std::lock_guard<std::mutex> lock_guard(m);
+
 	if (gameStatus == GAMESTATUS::RUNNING)
 	{
 		if (user == p1)
@@ -106,6 +111,8 @@ void Game::SendGameStartNtf()
 
 void Game::ReadyGame(User* user, bool isReady)
 {
+	std::lock_guard<std::mutex> lock_guard(m);
+
 	ERROR_CODE code = ERROR_CODE::NONE;
 	if (this->gameStatus != GAMESTATUS::WAITING)
 	{
@@ -178,15 +185,18 @@ void Game::SendTurnNtf(User* turnedUser)
 	PktTurnNtf pktNtfForP1;
 	PktTurnNtf pktNtfForP2;
 	
+	// atomic하게 처리할 부분 존재
 	if (turnedUser == p1)
 	{
 		pktNtfForP1.yourTurn = true;
 		pktNtfForP2.yourTurn = false;
+		p1TurnStartTime = time(NULL);
 	}
 	else
 	{
 		pktNtfForP1.yourTurn = false;
 		pktNtfForP2.yourTurn = true;
+		p2TurnStartTime = time(NULL);
 	}
 	this->network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtfForP1);
 	this->network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_TURN_NTF, sizeof(PktTurnNtf), (char*)&pktNtfForP2);
@@ -196,7 +206,8 @@ void Game::SendTurnNtf(User* turnedUser)
 bool Game::PlaceStone(User* user, int32_t x, int32_t y)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
-
+	std::lock_guard<std::mutex> lock_guard(m);
+	
 	if (gameStatus != GAMESTATUS::RUNNING)
 	{
 		return false;
@@ -280,6 +291,7 @@ void Game::AnalyzeBoard(User* user, int16_t x, int16_t y)
 {
 	int16_t color;
 
+	std::lock_guard<std::mutex> lock_guard(m);
 	if (user == p1)
 	{
 		color = 1;
@@ -321,5 +333,32 @@ void Game::MakeWin(User* user)
 
 GAMESTATUS Game::getGameStatus()
 {
+	std::lock_guard<std::mutex> lock_guard(m);
+
 	return this->gameStatus;
+}
+
+bool Game::IsGaming()
+{
+	std::lock_guard<std::mutex> lock_guard(m);
+
+	if (gameStatus == GAMESTATUS::RUNNING)
+	{
+		return true;
+	}
+	return false;
+}
+
+std::pair<User*, time_t> Game::GetGameP1AndTime()
+{
+	std::lock_guard<std::mutex> lock_guard(m);
+
+	return {p1, p1TurnStartTime};
+}
+
+std::pair<User*, time_t> Game::GetGameP2AndTime()
+{
+	std::lock_guard<std::mutex> lock_guard(m);
+
+	return { p2, p2TurnStartTime };
 }

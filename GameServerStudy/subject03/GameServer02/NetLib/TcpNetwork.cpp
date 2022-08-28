@@ -174,6 +174,8 @@ namespace NServerNetLib
 	{
 		auto& session = m_ClientSessionPool[sessionIndex];
 
+		// TODO: set Lock
+		std::unique_lock<std::mutex>(m);
 		auto pos = session.SendSize;
 		auto totalSize = (int16_t)(bodySize + PACKET_HEADER_SIZE);
 

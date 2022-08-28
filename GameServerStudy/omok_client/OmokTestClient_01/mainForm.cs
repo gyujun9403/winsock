@@ -31,9 +31,9 @@ namespace csharp_test_client
         Pen pen;
         Brush wBrush, bBrush;
         int margin = 40;
-        int 눈Size = 30; // gridSize
-        int 돌Size = 28; // stoneSize
-        int 화점Size = 10; // flowerSize
+        int gridSize = 30;
+        int stoneSize = 28;
+        int flowerSize = 10;
         Int16[,] board = new Int16[19, 19];
         bool isReady = false;
 
@@ -50,7 +50,7 @@ namespace csharp_test_client
         public mainForm()
         {
             InitializeComponent();
-
+            this.AutoScaleMode = AutoScaleMode.None;
             // 오목 게임판
             pen = new Pen(Color.Black);
             bBrush = new SolidBrush(Color.Black);
@@ -400,7 +400,7 @@ namespace csharp_test_client
             SolidBrush blueBrush = new SolidBrush(Color.Orange);
 
             // Create rectangle for region.
-            Rectangle fillRect = new Rectangle(0, 0, 2 * margin + 18 * 눈Size, 2 * margin + 18 * 눈Size);
+            Rectangle fillRect = new Rectangle(0, 0, 2 * margin + 18 * gridSize, 2 * margin + 18 * gridSize);
 
             // Create region for fill.
             Region fillRegion = new Region(fillRect);
@@ -410,15 +410,15 @@ namespace csharp_test_client
             // 세로선 19개
             for (int i = 0; i < 19; i++)
             {
-                g.DrawLine(pen, new Point(margin + i * 눈Size, margin),
-                  new Point(margin + i * 눈Size, margin + 18 * 눈Size));
+                g.DrawLine(pen, new Point(margin + i * gridSize, margin),
+                  new Point(margin + i * gridSize, margin + 18 * gridSize));
             }
 
             // 가로선 19개
             for (int i = 0; i < 19; i++)
             {
-                g.DrawLine(pen, new Point(margin, margin + i * 눈Size),
-                  new Point(margin + 18 * 눈Size, margin + i * 눈Size));
+                g.DrawLine(pen, new Point(margin, margin + i * gridSize),
+                  new Point(margin + 18 * gridSize, margin + i * gridSize));
             }
 
             // 화점그리기
@@ -426,9 +426,9 @@ namespace csharp_test_client
                 for (int y = 3; y <= 15; y += 6)
                 {
                     g.FillEllipse(bBrush,
-                      margin + 눈Size * x - 화점Size / 2,
-                      margin + 눈Size * y - 화점Size / 2,
-                      화점Size, 화점Size);
+                      margin + gridSize * x - flowerSize / 2,
+                      margin + gridSize * y - flowerSize / 2,
+                      flowerSize, flowerSize);
                 }
         }
 
@@ -443,9 +443,9 @@ namespace csharp_test_client
                         continue ;
                     }
                     Rectangle r = new Rectangle(
-                      margin + 눈Size * x - 돌Size / 2,
-                      margin + 눈Size * y - 돌Size / 2,
-                      돌Size, 돌Size);
+                      margin + gridSize * x - stoneSize / 2,
+                      margin + gridSize * y - stoneSize / 2,
+                      stoneSize, stoneSize);
                     if (board[x, y] == 1)
                     {
                         g.FillEllipse(wBrush, r);
@@ -461,9 +461,9 @@ namespace csharp_test_client
         private void placeStoneAt(Int32 x, Int32 y, bool color)
         {
             Rectangle r = new Rectangle(
-              margin + 눈Size * x - 돌Size / 2,
-              margin + 눈Size * y - 돌Size / 2,
-              돌Size, 돌Size);
+              margin + gridSize * x - stoneSize / 2,
+              margin + gridSize * y - stoneSize / 2,
+              stoneSize, stoneSize);
             if (color == true)
             {
                 board[x, y] = 1;
@@ -488,16 +488,8 @@ namespace csharp_test_client
 
         private void panel1_MouseDown(object sender, MouseEventArgs e)
         {
-            // e.X는 픽셀단위, x는 바둑판 좌표
-            Int32 x = (e.X - margin + 눈Size / 2) / 눈Size;
-            Int32 y = (e.Y - margin + 눈Size / 2) / 눈Size;
-
-            // 해당 좌표를 클릭한다 -> 서버에 그 좌표를 보낸다 -> 서버가 그 좌표에 찍어도 된다고 하면 찍는다.
-            // 클라단에서 특정 위치가 되는지 안되는지에 대한 정보를 가지고 있을 필요는 없다.
-            // 서버가 보낼 패킷의 정보에는 좌표, 색의 위치를 Ntf로 보낸다.
-            // 그렇다면, panel1_MouseDown에서는 좌표 정보를 서버로 보내는 함수가 되고, 그리는 함수는 따로 패킷처리 하는 함수 만들어야 한다.
-            //
-            // 서버 쪽에 좌표를 보내는 코드.
+            Int32 x = (e.X - margin + gridSize / 2) / gridSize;
+            Int32 y = (e.Y - margin + gridSize / 2) / gridSize;
 
             var requestPkt = new PlacingStoneReqPacket();
             requestPkt.SetValue(x, y);

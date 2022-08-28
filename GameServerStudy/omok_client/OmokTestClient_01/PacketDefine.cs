@@ -52,6 +52,7 @@ namespace csharp_test_client
         OMOK_GAME_START_NTF = 87,
         //OMOK_GAME_END_NTF = 88,
         OMOK_TURN_NTF = 89,
+        OMOK_DRAG_NTF = 90,
         //PACKET_ID_ERROR_NTF = 703,
         //OMOK_CLEAR_BOARD_NTF = 99,
         //승리 패배

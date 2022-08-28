@@ -54,6 +54,9 @@
     <ClInclude Include="Game.h">
       <Filter>homework</Filter>
     </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>homework</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NetLib\TcpNetwork.cpp">
@@ -81,6 +84,9 @@
       <Filter>homework</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
+      <Filter>homework</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
       <Filter>homework</Filter>
     </ClCompile>
   </ItemGroup>

@@ -151,4 +151,9 @@ struct PktGameResultNtf
 	int16_t isWin;
 };
 
+struct PktGameDragNtf
+{
+	uint16_t leftSecond;
+};
+
 #pragma pack(pop)
