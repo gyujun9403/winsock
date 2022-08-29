@@ -103,7 +103,8 @@ ERROR_CODE Server::LoadConfig()
 
     this->serverConfig_->ExtraClientCount = 64;
     this->serverConfig_->MaxRoomCount = 20;
-    this->serverConfig_->MaxRoomUserCount = 4;
+    //this->serverConfig_->MaxRoomUserCount = 4;
+    this->serverConfig_->MaxRoomUserCount = 2;
 
     this->logger_->Write(NServerNetLib::LOG_TYPE::L_INFO, "%s | Port(%d), Backlog(%d)", __FUNCTION__, this->serverConfig_->Port, this->serverConfig_->BackLogCount);
     return ERROR_CODE::NONE;
