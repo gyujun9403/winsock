@@ -90,7 +90,6 @@ namespace csharp_test_client
         private void btnConnect_Click(object sender, EventArgs e)
         {
             string address = textBoxIP.Text;
-
             if (checkBoxLocalHostIP.Checked)
             {
                 address = "127.0.0.1";
@@ -537,6 +536,11 @@ namespace csharp_test_client
         }
 
         private void textBoxUserID_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBoxIP_TextChanged(object sender, EventArgs e)
         {
 
         }
