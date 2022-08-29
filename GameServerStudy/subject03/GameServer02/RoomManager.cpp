@@ -57,3 +57,15 @@ Room* RoomManager::GetRoomUserEntered(User* user)
 	}
 	return nullptr;
 }
+
+void RoomManager::ManageDraggingUsers(uint16_t limitTime, uint16_t countTime)
+{
+	for (Room* element : this->m_RoomList)
+	{
+		if (element->IsOmokRunning())
+		{
+			element->SendDragingMsg(limitTime, countTime);
+			//return element;
+		}
+	}
+}

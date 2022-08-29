@@ -114,6 +114,14 @@ namespace csharp_test_client
 
         private void btnDisconnect_Click(object sender, EventArgs e)
         {
+            setIsReady(false);
+            btnReady.Enabled = true;
+            btnReady.Text = "READY";
+            btnReady.BackColor = System.Drawing.Color.White;
+            board.ClearAll();
+            BoardClear();
+            DrawBoard();
+
             SetDisconnectd();
             Network.Close();
         }

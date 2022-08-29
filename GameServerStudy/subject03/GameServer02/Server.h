@@ -25,6 +25,8 @@ public:
 	ERROR_CODE Init();
 	void Run();
 	void Stop();
+	//TODO:
+	RoomManager* getRoomMangerInServer();
 private:
 	void Release(); //TODO: 무슨 역할인지 알아보기 -> TcpNetwork -> WSACleanup()
 	ERROR_CODE LoadConfig();

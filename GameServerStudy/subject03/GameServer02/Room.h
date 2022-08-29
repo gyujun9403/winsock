@@ -54,7 +54,8 @@ public:
 	void OmokReadyUser(User* user, bool isReady);
 	void OmokPlaceStone(User* user, int32_t x, int32_t y);
 	void OmokLeaveOther(User* user);
-	void SendDragingMsg(int limitSec);
+	bool IsOmokRunning();
+	void SendDragingMsg(uint16_t limitTime, uint16_t countTime);
 private:
 	ILog* m_pRefLogger;
 	TcpNet* m_pRefNetwork;
@@ -67,6 +68,7 @@ private:
 
 	// Room 에서 Game관련 조작 기능을 추가해주어야 할 것 같다... -> 모든 함수들이 유저의 fd값(세션 번호)랑 패킷 그대로 넣고, 특정 함수를 호출하는 함수들. -> game의 함수들보다 더 간단하게 사용 가능하게.
 	// 외부에서는 
+	std::mutex m;
 	Game* m_pGame = nullptr;
 	std::mutex* gameM = nullptr;
 };

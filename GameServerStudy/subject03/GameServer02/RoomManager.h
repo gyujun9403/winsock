@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <vector>
+#include <mutex>
 #include <unordered_map>
 
 
@@ -42,10 +43,11 @@ public:
 	
 	Room* GetRoomUserEntered(User* user);
 
+	void ManageDraggingUsers(uint16_t limitTime, uint16_t countTime);
+
 protected:
 	ILog* m_pRefLogger;
 	TcpNet* m_pRefNetwork;
-		
 	std::vector<Room*> m_RoomList;
 };
 

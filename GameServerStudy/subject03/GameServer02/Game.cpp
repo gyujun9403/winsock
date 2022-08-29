@@ -7,14 +7,14 @@
 
 void Game::setNetwork(Network* net)
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 	this->network = net;
 	this->turn = true;
 }
 
 void Game::EnterGame(User* user)
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	if (this->p1 == nullptr)
 	{
@@ -32,7 +32,7 @@ void Game::EnterGame(User* user)
 
 void Game::LeaveGame(User* user)
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	if (gameStatus == GAMESTATUS::RUNNING)
 	{
@@ -111,7 +111,7 @@ void Game::SendGameStartNtf()
 
 void Game::ReadyGame(User* user, bool isReady)
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	ERROR_CODE code = ERROR_CODE::NONE;
 	if (this->gameStatus != GAMESTATUS::WAITING)
@@ -153,6 +153,8 @@ void Game::ReadyGame(User* user, bool isReady)
 				p2StoneColor = false;
 				turn = false;
 			}
+			p1TurnStartTime = time(NULL);
+			p2TurnStartTime = time(NULL);
 		}
 	}
 }
@@ -206,7 +208,7 @@ void Game::SendTurnNtf(User* turnedUser)
 bool Game::PlaceStone(User* user, int32_t x, int32_t y)
 {
 	ERROR_CODE code = ERROR_CODE::NONE;
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 	
 	if (gameStatus != GAMESTATUS::RUNNING)
 	{
@@ -291,7 +293,7 @@ void Game::AnalyzeBoard(User* user, int16_t x, int16_t y)
 {
 	int16_t color;
 
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 	if (user == p1)
 	{
 		color = 1;
@@ -305,6 +307,22 @@ void Game::AnalyzeBoard(User* user, int16_t x, int16_t y)
 	{
 		ClearBoard();
 		MakeWin(user);
+	}
+}
+
+void Game::TimeOver(User* user)
+{
+	//std::lock_guard<std::mutex> lock_guard(m);
+	if (user == p1)
+	{
+		//TODO: 일단은 타임오버 노티피 없이.
+		ClearBoard();
+		MakeWin(p2);
+	}
+	else if (user == p2)
+	{
+		ClearBoard();
+		MakeWin(p1);
 	}
 }
 
@@ -333,14 +351,14 @@ void Game::MakeWin(User* user)
 
 GAMESTATUS Game::getGameStatus()
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	return this->gameStatus;
 }
 
 bool Game::IsGaming()
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	if (gameStatus == GAMESTATUS::RUNNING)
 	{
@@ -349,16 +367,49 @@ bool Game::IsGaming()
 	return false;
 }
 
+void Game::ManageDragingProcess(uint16_t limitTime, uint16_t countTime)
+{
+	PktGameDragNtf pktNtf;
+	time_t now = time(NULL);
+	/*std::pair<User*, time_t> p1AndTurnedTime = m_pGame->GetGameP1AndTime();
+	std::pair<User*, time_t> p2AndTurnedTime = m_pGame->GetGameP2AndTime();*/
+	if (turn == true)
+	{
+		if (now > p1TurnStartTime + limitTime + countTime)
+		{
+			TimeOver(p1);
+		}
+		else if (now > p1TurnStartTime + limitTime)
+		{
+			//TODO: 되는지 확인하고, 되면 3초 넘기면 자동으로 턴 넘어가게 하기.
+			pktNtf.leftSecond = static_cast<uint16_t>(countTime - (now - p1TurnStartTime - limitTime) + 1);
+			network->SendData(p1->GetSessionIndex(), (short)PACKET_ID::OMOK_DRAG_NTF, sizeof(PktGameDragNtf), (char*)&pktNtf);
+		}
+	}
+	else if (turn == false)
+	{
+		if (now > p2TurnStartTime + limitTime + countTime)
+		{
+			TimeOver(p2);
+		}
+		else if (now > p2TurnStartTime + limitTime)
+		{
+			pktNtf.leftSecond = static_cast<uint16_t>(countTime - (now - p2TurnStartTime - limitTime) + 1);
+			network->SendData(p2->GetSessionIndex(), (short)PACKET_ID::OMOK_DRAG_NTF, sizeof(PktGameDragNtf), (char*)&pktNtf);
+		}
+	}
+}
+
 std::pair<User*, time_t> Game::GetGameP1AndTime()
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	return {p1, p1TurnStartTime};
 }
 
 std::pair<User*, time_t> Game::GetGameP2AndTime()
 {
-	std::lock_guard<std::mutex> lock_guard(m);
+	//std::lock_guard<std::mutex> lock_guard(m);
 
 	return { p2, p2TurnStartTime };
 }

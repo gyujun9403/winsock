@@ -29,19 +29,21 @@ public:
 	void ReadyGame(User* user, bool isReady); // 게임 시작. -> 둘 다 레디,
 	bool PlaceStone(User* user, int32_t x, int32_t y);
 	void AnalyzeBoard(User* user, int16_t x, int16_t y);
+	void TimeOver(User* user);
 	//void AnalyzeBoard();
 	GAMESTATUS getGameStatus();
 	// 게임중인지 확인할 수 있는 함수
 	bool IsGaming();
 	// 누가 몇 초 카운트 남았는지 전달하는 함수.
 	// -> pair로 해서 반환?
+	void ManageDragingProcess(uint16_t limitTime, uint16_t countTime);
 	std::pair<User*, time_t> GetGameP1AndTime();
 	std::pair<User*, time_t> GetGameP2AndTime();
 	//bool IsGaming(); // 게임중인지 아닌지 표시.
-	std::mutex* getMutex();
+	//std::mutex* getMutex();
 private:
 	void ClearBoard(); // 오목판 비우기
-	void MakeWin(User* user); // 누가 나가면, 그사람 승리하게 만듦.
+	void MakeWin(User* user); // 누가 나가, 그사람 승리하게 만듦.
 // 타이머 필요할듯.
 	std::mutex m;
 	User* p1;

@@ -74,6 +74,11 @@ void Server::Stop()
     this->isRun_ = false;
 }
 
+RoomManager* Server::getRoomMangerInServer()
+{
+    return roomMgr_.get();
+}
+
 void Server::Release()
 {
     if (this->network_)
