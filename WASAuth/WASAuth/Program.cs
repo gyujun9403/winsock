@@ -20,7 +20,12 @@ namespace WASAuth
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>() // 세미콜론 
+                        .ConfigureLogging((builder) =>
+                        {
+                            builder.AddConsole(); // 콘솔에 로깅
+                        });
+                    
                 });
     }
 }
