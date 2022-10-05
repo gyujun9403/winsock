@@ -89,7 +89,7 @@ namespace NServerNetLib
 		auto write_set = m_Readfds;
 		
 		timeval timeout{ 0, 1000 }; //tv_sec, tv_usec
-
+		//FIXME: 무한 block상태가 아님
         auto selectResult = select(0, &read_set, &write_set, 0, &timeout);
 
 		auto isFDSetChanged = RunCheckSelectResult(selectResult);

@@ -56,6 +56,7 @@ void Game::LeaveGame(User* user)
 	}
 }
 
+//FIXME: 하나의 함수가 clear이외의 여러 역할(보드 초기화 메세지 보내기 및 상태변화)을 하고 있으므로, 함수 이름을 바꾸거나 **기능 나누기**.
 void Game::ClearBoard()
 {
 	PktGameResetNtf pktNtf;
